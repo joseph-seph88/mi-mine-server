@@ -13,10 +13,6 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException('Token not found');
     }
 
-    // TODO: 실제 JWT 토큰 검증 로직 구현
-    // const payload = await this.jwtService.verifyAsync(token);
-    // request['user'] = payload;
-
     return true;
   }
 
