@@ -1,19 +1,27 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { DomainModule } from './domain/domain.module';
-import { ApplicationModule } from './application/application.module';
-import { InfrastructureModule } from './infrastructure/infrastructure.module';
-import { PresentationModule } from './presentation/presentation.module';
+import { UserModule } from './features/user/user.module';
+import { validationSchema } from './shared/config/validation.schema';
 
 @Module({
   imports: [
-    DomainModule,
-    ApplicationModule,
-    InfrastructureModule,
-    PresentationModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+      cache: true,
+      expandVariables: true,
+      validationSchema: validationSchema,
+      validationOptions: {
+        allowUnknown: true,
+        abortEarly: false,
+      },
+    }),
+
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

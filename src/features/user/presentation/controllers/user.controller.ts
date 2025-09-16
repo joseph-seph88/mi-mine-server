@@ -5,7 +5,7 @@ import { UserResponseDto } from '../../application/dtos/user-response.dto';
 
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Post()
   async createUser(@Body() createUserDto: CreateUserDto): Promise<UserResponseDto> {
@@ -21,13 +21,11 @@ export class UserController {
 
   @Get(':id')
   async getUserById(@Param('id') id: string): Promise<UserResponseDto> {
-    // TODO: GetUserByIdUseCase 구현 후 연결
     throw new HttpException('Not implemented', HttpStatus.NOT_IMPLEMENTED);
   }
 
   @Get()
   async getAllUsers(): Promise<UserResponseDto[]> {
-    // TODO: GetAllUsersUseCase 구현 후 연결
     throw new HttpException('Not implemented', HttpStatus.NOT_IMPLEMENTED);
   }
 }
