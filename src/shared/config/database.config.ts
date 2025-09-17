@@ -1,10 +1,4 @@
-export interface DatabaseConfig {
-  host: string;
-  port: number;
-  username: string;
-  password: string;
-  database: string;
-}
+import { DatabaseConfig } from '../interfaces/database.interface';
 
 export const databaseConfig: DatabaseConfig = {
   host: process.env.DB_HOST || 'localhost',
