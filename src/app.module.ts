@@ -1,24 +1,18 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './features/user/user.module';
-import { validationSchema } from './shared/config/validation.schema';
 import { AuthModule } from './shared/auth/auth.module';
+import { LoggingMiddleware } from './shared/middlewares/logging.middleware';
+import { appConfig } from './shared/config/app.config';
+import { typeOrmConfig } from './shared/config/typeorm.config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: '.env',
-      cache: true,
-      expandVariables: true,
-      validationSchema: validationSchema,
-      validationOptions: {
-        allowUnknown: true,
-        abortEarly: false,
-      },
-    }),
+    ConfigModule.forRoot(appConfig),
+    TypeOrmModule.forRoot(typeOrmConfig),
 
     AuthModule,
     UserModule,
@@ -26,4 +20,10 @@ import { AuthModule } from './shared/auth/auth.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(LoggingMiddleware)
+      .forRoutes('*');
+  }
+}
