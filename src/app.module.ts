@@ -4,6 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './features/user/user.module';
 import { validationSchema } from './shared/config/validation.schema';
+import { AuthModule } from './shared/auth/auth.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { validationSchema } from './shared/config/validation.schema';
       },
     }),
 
+    AuthModule,
     UserModule,
   ],
   controllers: [AppController],
