@@ -5,7 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
-import { JWT_CONSTANTS } from './constants/auth.constants';
+import { JWT_CONSTANTS } from '../constants/auth.constants';
 
 @Module({
     imports: [
@@ -24,4 +24,4 @@ import { JWT_CONSTANTS } from './constants/auth.constants';
     providers: [JwtStrategy, JwtAuthGuard, RolesGuard],
     exports: [JwtAuthGuard, RolesGuard, JwtModule],
 })
-export class AuthModule { }
+export class JwtAuthModule { }

@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { User } from '../entities/user.entity';
-import { UserRepository } from '../repositories/user.repository.interface';
+import { UserRepositoryInterface } from '../repositories/user.repository.interface';
 
 export interface CreateUserRequest {
   email: string;
@@ -15,7 +15,7 @@ export interface CreateUserResponse {
 export class CreateUserUseCase {
   constructor(
     @Inject('UserRepository')
-    private readonly userRepository: UserRepository,
+    private readonly userRepository: UserRepositoryInterface,
   ) { }
 
   async execute(request: CreateUserRequest): Promise<CreateUserResponse> {

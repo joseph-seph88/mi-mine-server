@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { UserController } from './presentation/controllers/user.controller';
 import { UserService } from './application/services/user.service';
-import { CreateUserUsecase } from './domain/usecases/create-user.usecase';
+import { CreateUserUseCase } from './domain/usecases/create-user.usecase';
 import { UserRepository } from './infrastructure/repositories/user.repository';
 import { UserRepositoryInterface } from './domain/repositories/user.repository.interface';
 
@@ -9,12 +9,18 @@ import { UserRepositoryInterface } from './domain/repositories/user.repository.i
     controllers: [UserController],
     providers: [
         UserService,
-        CreateUserUsecase,
+        CreateUserUseCase,
         {
-            provide: UserRepositoryInterface,
+            provide: 'UserRepository',
             useClass: UserRepository,
         },
     ],
-    exports: [UserService],
+    exports: [
+        UserService,
+        {
+            provide: 'UserRepository',
+            useClass: UserRepository,
+        },
+    ],
 })
 export class UserModule { }
