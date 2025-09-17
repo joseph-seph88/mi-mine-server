@@ -3,8 +3,9 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UserModule } from './features/user/user.module';
-import { AuthModule } from './shared/auth/auth.module';
+import { UserModule } from './modules/user/user.module';
+import { JwtAuthModule } from './shared/auth/jwt-auth.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { LoggingMiddleware } from './shared/middlewares/logging.middleware';
 import { appConfig } from './shared/config/app.config';
 import { typeOrmConfig } from './shared/config/typeorm.config';
@@ -14,6 +15,7 @@ import { typeOrmConfig } from './shared/config/typeorm.config';
     ConfigModule.forRoot(appConfig),
     TypeOrmModule.forRoot(typeOrmConfig),
 
+    JwtAuthModule,
     AuthModule,
     UserModule,
   ],
