@@ -13,6 +13,7 @@ export class User {
     public readonly roles: UserRole[],
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
+    public readonly deletedAt: Date | null,
   ) { }
 
   static create(
@@ -38,7 +39,8 @@ export class User {
       postCount || 0,
       roles || [UserRole.USER],
       now,
-      now
+      now,
+      null
     );
   }
 
@@ -55,6 +57,7 @@ export class User {
       this.roles,
       this.createdAt,
       new Date(),
+      this.deletedAt,
     );
   }
 
@@ -71,6 +74,85 @@ export class User {
       this.roles,
       this.createdAt,
       new Date(),
+      this.deletedAt,
+    );
+  }
+
+  softDelete(): User {
+    return new User(
+      this.id,
+      this.email,
+      this.nickName,
+      this.password,
+      this.profileImageUrl,
+      this.friendCount,
+      this.followerCount,
+      this.postCount,
+      this.roles,
+      this.createdAt,
+      new Date(),
+      new Date(),
+    );
+  }
+  isDeleted(): boolean {
+    return this.deletedAt !== null;
+  }
+
+  updateProfile(updates: {
+    nickName?: string;
+    profileImageUrl?: string;
+  }): User {
+    return new User(
+      this.id,
+      this.email,
+      updates.nickName ?? this.nickName,
+      this.password,
+      updates.profileImageUrl ?? this.profileImageUrl,
+      this.friendCount,
+      this.followerCount,
+      this.postCount,
+      this.roles,
+      this.createdAt,
+      new Date(),
+      this.deletedAt,
+    );
+  }
+
+  updateCounts(updates: {
+    friendCount?: number;
+    followerCount?: number;
+    postCount?: number;
+  }): User {
+    return new User(
+      this.id,
+      this.email,
+      this.nickName,
+      this.password,
+      this.profileImageUrl,
+      updates.friendCount ?? this.friendCount,
+      updates.followerCount ?? this.followerCount,
+      updates.postCount ?? this.postCount,
+      this.roles,
+      this.createdAt,
+      new Date(),
+      this.deletedAt,
+    );
+  }
+
+  updateRoles(roles: UserRole[]): User {
+    return new User(
+      this.id,
+      this.email,
+      this.nickName,
+      this.password,
+      this.profileImageUrl,
+      this.friendCount,
+      this.followerCount,
+      this.postCount,
+      roles,
+      this.createdAt,
+      new Date(),
+      this.deletedAt,
     );
   }
 }

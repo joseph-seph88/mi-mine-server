@@ -1,31 +1,34 @@
-import { Controller, Post, Body, Get, Param, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Body, Get, Param, HttpException, HttpStatus, HttpCode, Patch, Delete } from '@nestjs/common';
 import { UserService } from '../../application/services/user.service';
-import { CreateUserDto } from '../../application/dtos/create-user.dto';
-import { UserResponseDto } from '../../application/dtos/user-response.dto';
+import { UserResponseDto } from '../dtos/user-response.dto';
+import { API_TAGS, CONTROLLERS } from '../../../../shared/constants/api.constants';
+import { ApiTags } from '@nestjs/swagger';
+import { ApiDeleteResponse, ApiGetResponse, ApiUpdateResponse } from 'src/shared/decorators/swagger/api-response.decorator';
+import { UserRequestDto } from '../dtos/user-request.dto';
 
-@Controller('users')
+@ApiTags(API_TAGS.USER)
+@Controller(CONTROLLERS.USER)
 export class UserController {
   constructor(private readonly userService: UserService) { }
 
-  @Post()
-  async createUser(@Body() createUserDto: CreateUserDto): Promise<UserResponseDto> {
-    try {
-      return await this.userService.createUser(createUserDto);
-    } catch (error) {
-      throw new HttpException(
-        error.message || 'Internal server error',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-  }
-
   @Get(':id')
+  @HttpCode(HttpStatus.OK)
+  @ApiGetResponse('사용자 조회', UserResponseDto)
   async getUserById(@Param('id') id: string): Promise<UserResponseDto> {
-    throw new HttpException('Not implemented', HttpStatus.NOT_IMPLEMENTED);
+    return await this.userService.getUserById(id);
   }
 
-  @Get()
-  async getAllUsers(): Promise<UserResponseDto[]> {
-    throw new HttpException('Not implemented', HttpStatus.NOT_IMPLEMENTED);
+  @Patch(':id')
+  @HttpCode(HttpStatus.OK)
+  @ApiUpdateResponse('사용자 수정', UserResponseDto)
+  async updateUser(@Param('id') id: string, @Body() userRequestDto: UserRequestDto): Promise<UserResponseDto> {
+    return await this.userService.updateUser(id, userRequestDto);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.OK)
+  @ApiDeleteResponse('사용자 삭제')
+  async deleteUser(@Param('id') id: string): Promise<void> {
+    return await this.userService.deleteUser(id);
   }
 }
