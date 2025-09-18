@@ -6,7 +6,7 @@ export class UserMapper {
     return new UserResponseDto(
       user.id,
       user.email,
-      user.name,
+      user.nickName,
       user.createdAt,
       user.updatedAt,
     );

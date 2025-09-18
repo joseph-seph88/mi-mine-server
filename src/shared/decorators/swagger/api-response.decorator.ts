@@ -1,11 +1,13 @@
 import { applyDecorators, Type } from '@nestjs/common';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiExtraModels, getSchemaPath } from '@nestjs/swagger';
 import { RESPONSE_MESSAGES } from '../../constants/messages.constants';
+import { ApiResponseDto } from '../../dtos/api-response.dto';
 
 interface ApiResponseOptions {
     includeAuth?: boolean;
     includeNotFound?: boolean;
     customErrors?: { status: number; description: string }[];
+    wrapWithApiResponse?: boolean;
 }
 
 /**
@@ -19,13 +21,60 @@ export const ApiCommonResponses = <T = any>(
     responseType?: Type<T>,
     options: ApiResponseOptions = {}
 ) => {
+    const finalOptions = { wrapWithApiResponse: true, ...options };
     const decorators = [
-        ApiOperation({ summary }),
-        ApiResponse({
-            status: 200,
-            description: RESPONSE_MESSAGES.SUCCESS,
-            type: responseType,
-        }),
+        ApiOperation({ summary })
+    ];
+
+    if (finalOptions.wrapWithApiResponse) {
+        if (responseType) {
+            decorators.push(
+                ApiExtraModels(ApiResponseDto, responseType),
+                ApiResponse({
+                    status: 200,
+                    description: RESPONSE_MESSAGES.SUCCESS,
+                    schema: {
+                        allOf: [
+                            { $ref: getSchemaPath(ApiResponseDto) },
+                            {
+                                properties: {
+                                    data: { $ref: getSchemaPath(responseType) }
+                                }
+                            }
+                        ]
+                    }
+                })
+            );
+        } else {
+            decorators.push(
+                ApiExtraModels(ApiResponseDto),
+                ApiResponse({
+                    status: 200,
+                    description: RESPONSE_MESSAGES.SUCCESS,
+                    schema: {
+                        allOf: [
+                            { $ref: getSchemaPath(ApiResponseDto) },
+                            {
+                                properties: {
+                                    data: { type: 'null' }
+                                }
+                            }
+                        ]
+                    }
+                })
+            );
+        }
+    } else {
+        decorators.push(
+            ApiResponse({
+                status: 200,
+                description: RESPONSE_MESSAGES.SUCCESS,
+                type: responseType,
+            })
+        );
+    }
+
+    decorators.push(
         ApiResponse({
             status: 400,
             description: RESPONSE_MESSAGES.BAD_REQUEST
@@ -34,9 +83,9 @@ export const ApiCommonResponses = <T = any>(
             status: 500,
             description: RESPONSE_MESSAGES.INTERNAL_ERROR
         })
-    ];
+    );
 
-    if (options.includeAuth) {
+    if (finalOptions.includeAuth) {
         decorators.push(
             ApiResponse({
                 status: 401,
@@ -49,7 +98,7 @@ export const ApiCommonResponses = <T = any>(
         );
     }
 
-    if (options.includeNotFound) {
+    if (finalOptions.includeNotFound) {
         decorators.push(
             ApiResponse({
                 status: 404,
@@ -58,9 +107,9 @@ export const ApiCommonResponses = <T = any>(
         );
     }
 
-    if (options.customErrors) {
+    if (finalOptions.customErrors) {
         decorators.push(
-            ...options.customErrors.map(error =>
+            ...finalOptions.customErrors.map(error =>
                 ApiResponse({
                     status: error.status,
                     description: error.description
@@ -83,13 +132,60 @@ export const ApiCreateResponse = <T = any>(
     responseType?: Type<T>,
     options: Omit<ApiResponseOptions, 'includeNotFound'> = {}
 ) => {
+    const finalOptions = { wrapWithApiResponse: true, ...options };
     const decorators = [
-        ApiOperation({ summary }),
-        ApiResponse({
-            status: 201,
-            description: RESPONSE_MESSAGES.CREATED,
-            type: responseType,
-        }),
+        ApiOperation({ summary })
+    ];
+
+    if (finalOptions.wrapWithApiResponse) {
+        if (responseType) {
+            decorators.push(
+                ApiExtraModels(ApiResponseDto, responseType),
+                ApiResponse({
+                    status: 201,
+                    description: RESPONSE_MESSAGES.CREATED,
+                    schema: {
+                        allOf: [
+                            { $ref: getSchemaPath(ApiResponseDto) },
+                            {
+                                properties: {
+                                    data: { $ref: getSchemaPath(responseType) }
+                                }
+                            }
+                        ]
+                    }
+                })
+            );
+        } else {
+            decorators.push(
+                ApiExtraModels(ApiResponseDto),
+                ApiResponse({
+                    status: 201,
+                    description: RESPONSE_MESSAGES.CREATED,
+                    schema: {
+                        allOf: [
+                            { $ref: getSchemaPath(ApiResponseDto) },
+                            {
+                                properties: {
+                                    data: { type: 'null' }
+                                }
+                            }
+                        ]
+                    }
+                })
+            );
+        }
+    } else {
+        decorators.push(
+            ApiResponse({
+                status: 201,
+                description: RESPONSE_MESSAGES.CREATED,
+                type: responseType,
+            })
+        );
+    }
+
+    decorators.push(
         ApiResponse({
             status: 400,
             description: RESPONSE_MESSAGES.BAD_REQUEST
@@ -98,9 +194,9 @@ export const ApiCreateResponse = <T = any>(
             status: 500,
             description: RESPONSE_MESSAGES.INTERNAL_ERROR
         })
-    ];
+    );
 
-    if (options.includeAuth) {
+    if (finalOptions.includeAuth) {
         decorators.push(
             ApiResponse({
                 status: 401,
@@ -113,9 +209,9 @@ export const ApiCreateResponse = <T = any>(
         );
     }
 
-    if (options.customErrors) {
+    if (finalOptions.customErrors) {
         decorators.push(
-            ...options.customErrors.map(error =>
+            ...finalOptions.customErrors.map(error =>
                 ApiResponse({
                     status: error.status,
                     description: error.description
@@ -167,6 +263,7 @@ export const ApiDeleteResponse = (
         includeAuth: true
     }
 ) => {
+    const finalOptions = { wrapWithApiResponse: true, ...options };
     const decorators = [
         ApiOperation({ summary }),
         ApiResponse({
@@ -183,7 +280,7 @@ export const ApiDeleteResponse = (
         })
     ];
 
-    if (options.includeNotFound) {
+    if (finalOptions.includeNotFound) {
         decorators.push(
             ApiResponse({
                 status: 404,
@@ -192,7 +289,7 @@ export const ApiDeleteResponse = (
         );
     }
 
-    if (options.includeAuth) {
+    if (finalOptions.includeAuth) {
         decorators.push(
             ApiResponse({
                 status: 401,
@@ -205,9 +302,9 @@ export const ApiDeleteResponse = (
         );
     }
 
-    if (options.customErrors) {
+    if (finalOptions.customErrors) {
         decorators.push(
-            ...options.customErrors.map(error =>
+            ...finalOptions.customErrors.map(error =>
                 ApiResponse({
                     status: error.status,
                     description: error.description

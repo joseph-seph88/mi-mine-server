@@ -24,5 +24,5 @@ export class RegisterDto {
     })
     @IsString({ message: '이름은 문자열이어야 합니다.' })
     @MinLength(2, { message: '이름은 최소 2자 이상이어야 합니다.' })
-    name: string;
+    nickName: string;
 }

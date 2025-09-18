@@ -2,12 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { User } from '../../../user/domain/entities/user.entity';
-import { AuthToken } from '../../domain/entities/auth-token.entity';
+import { AuthToken } from '../../domain/interfaces/auth-token.interface';
+import { TokenGeneratorInterface } from '../../domain/services/token-generator.interface';
 import { JwtPayload } from '../../../../shared/interfaces/jwt-payload.interface';
 import { JWT_CONSTANTS } from '../../../../shared/constants/auth.constants';
 
 @Injectable()
-export class TokenService {
+export class JwtTokenGenerator implements TokenGeneratorInterface {
     constructor(
         private readonly jwtService: JwtService,
         private readonly configService: ConfigService,
@@ -17,7 +18,7 @@ export class TokenService {
         const payload: JwtPayload = {
             sub: user.id,
             email: user.email,
-            name: user.name,
+            name: user.nickName,
             roles: user.roles,
         };
 
@@ -36,12 +37,12 @@ export class TokenService {
             this.configService.get<string>(JWT_CONSTANTS.ACCESS_EXPIRES_IN, '15m')
         );
 
-        return AuthToken.create(accessToken, refreshToken, expiresIn);
+        return { accessToken, refreshToken, expiresIn };
     }
 
     private parseExpiresIn(expiresIn: string): number {
         const match = expiresIn.match(/^(\d+)([smhd])$/);
-        if (!match) return 900; // 기본값: 15분
+        if (!match) return 900;
 
         const value = parseInt(match[1]);
         const unit = match[2];

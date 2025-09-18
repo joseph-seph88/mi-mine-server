@@ -17,10 +17,6 @@ import { UserRepositoryInterface } from './domain/repositories/user.repository.i
     ],
     exports: [
         UserService,
-        {
-            provide: 'UserRepository',
-            useClass: UserRepository,
-        },
     ],
 })
 export class UserModule { }

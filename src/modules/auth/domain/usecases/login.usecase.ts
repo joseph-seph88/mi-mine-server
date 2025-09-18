@@ -1,54 +1,32 @@
-import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
-import { UserRepositoryInterface } from '../../../user/domain/repositories/user.repository.interface';
+import { Injectable, Inject } from '@nestjs/common';
+import { UserPort } from '../ports/user.port';
 import { AuthRepositoryInterface } from '../repositories/auth.repository.interface';
-import { AuthToken } from '../entities/auth-token.entity';
 import { AuthSession } from '../entities/auth-session.entity';
-import { TokenService } from '../../application/services/token.service';
-
-export interface LoginRequest {
-    email: string;
-    password: string;
-}
-
-export interface LoginResponse {
-    token: AuthToken;
-    user: {
-        id: string;
-        email: string;
-        name: string;
-    };
-}
+import { TokenGeneratorInterface } from '../services/token-generator.interface';
+import { LoginRequest } from '../interfaces/request/login-request.interface';
+import { LoginResponse } from '../interfaces/response/login-response.interface';
 
 @Injectable()
 export class LoginUseCase {
     constructor(
-        @Inject('UserRepository')
-        private readonly userRepository: UserRepositoryInterface,
+        @Inject('UserPort')
+        private readonly userPort: UserPort,
         @Inject('AuthRepository')
         private readonly authRepository: AuthRepositoryInterface,
-        private readonly tokenService: TokenService,
+        @Inject('TokenGenerator')
+        private readonly tokenGenerator: TokenGeneratorInterface,
     ) { }
 
     async execute(request: LoginRequest): Promise<LoginResponse> {
         const { email, password } = request;
 
-        const user = await this.userRepository.findByEmail(email);
-        if (!user) {
-            throw new UnauthorizedException('이메일 또는 비밀번호가 잘못되었습니다.');
-        }
-
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) {
-            throw new UnauthorizedException('이메일 또는 비밀번호가 잘못되었습니다.');
-        }
+        const user = await this.userPort.validateUserCredentials(email, password);
 
         await this.authRepository.deleteSessionsByUserId(user.id);
 
-        const token = await this.tokenService.generateTokens(user);
+        const token = await this.tokenGenerator.generateTokens(user);
 
         const session = AuthSession.create(
-            this.generateId(),
             user.id,
             token.accessToken,
             token.refreshToken,
@@ -58,16 +36,18 @@ export class LoginUseCase {
         await this.authRepository.saveSession(session);
 
         return {
-            token,
+            accessToken: token.accessToken,
+            refreshToken: token.refreshToken,
             user: {
                 id: user.id,
                 email: user.email,
-                name: user.name,
+                nickName: user.nickName,
+                profileImageUrl: user.profileImageUrl,
+                friendCount: user.friendCount,
+                followerCount: user.followerCount,
+                postCount: user.postCount,
             },
         };
     }
 
-    private generateId(): string {
-        return Math.random().toString(36).substr(2, 9);
-    }
 }

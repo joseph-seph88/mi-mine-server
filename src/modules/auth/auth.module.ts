@@ -1,25 +1,25 @@
 import { Module } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { AuthController } from './presentation/controllers/auth.controller';
 import { AuthService } from './application/services/auth.service';
-import { TokenService } from './application/services/token.service';
+import { JwtTokenGenerator } from './infrastructure/services/jwt-token-generator.service';
 import { LoginUseCase } from './domain/usecases/login.usecase';
 import { RegisterUseCase } from './domain/usecases/register.usecase';
 import { RefreshTokenUseCase } from './domain/usecases/refresh-token.usecase';
 import { AuthRepository } from './infrastructure/repositories/auth.repository';
+import { UserAdapter } from './infrastructure/adapters/user.adapter';
 import { UserModule } from '../user/user.module';
+import { JwtAuthModule } from '../../shared/auth/jwt-auth.module';
 
 @Module({
     imports: [
         ConfigModule,
-        JwtModule.register({}), 
-        UserModule, 
+        JwtAuthModule,
+        UserModule,
     ],
     controllers: [AuthController],
     providers: [
         AuthService,
-        TokenService,
 
         LoginUseCase,
         RegisterUseCase,
@@ -28,6 +28,14 @@ import { UserModule } from '../user/user.module';
         {
             provide: 'AuthRepository',
             useClass: AuthRepository,
+        },
+        {
+            provide: 'TokenGenerator',
+            useClass: JwtTokenGenerator,
+        },
+        {
+            provide: 'UserPort',
+            useClass: UserAdapter,
         },
     ],
     exports: [AuthService],

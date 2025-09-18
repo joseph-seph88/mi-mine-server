@@ -9,14 +9,13 @@ export class AuthSession {
     ) { }
 
     static create(
-        id: string,
         userId: string,
         accessToken: string,
         refreshToken: string,
         expiresAt: Date,
     ): AuthSession {
         return new AuthSession(
-            id,
+            crypto.randomUUID(),
             userId,
             accessToken,
             refreshToken,
