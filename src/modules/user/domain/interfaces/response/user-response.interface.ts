@@ -8,3 +8,10 @@ export interface UserResponse {
     postCount: number;
     roles?: string[];
 }
+
+export interface UserInfo {
+    id: string;
+    email: string;
+    nickName: string;
+    roles: string[];
+}

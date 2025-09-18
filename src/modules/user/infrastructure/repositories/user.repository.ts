@@ -1,61 +1,66 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { User } from '../../domain/entities/user.entity';
 import { UserRepositoryInterface } from '../../domain/repositories/user.repository.interface';
 
 @Injectable()
 export class UserRepository implements UserRepositoryInterface {
-  private users: Map<string, User> = new Map();
+  constructor(
+    @InjectRepository(User)
+    private readonly repository: Repository<User>,
+  ) { }
 
   async findById(id: string): Promise<User | null> {
-    const user = this.users.get(id);
-    return user && !user.isDeleted() ? user : null;
+    return await this.repository.findOne({
+      where: { id }
+    });
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    for (const user of this.users.values()) {
-      if (user.email === email && !user.isDeleted()) {
-        return user;
-      }
-    }
-    return null;
+    return await this.repository.findOne({
+      where: { email }
+    });
   }
 
   async save(user: User): Promise<User> {
-    this.users.set(user.id, user);
-    return user;
+    return await this.repository.save(user);
   }
 
   async update(id: string, user: User): Promise<User | null> {
-    const existingUser = this.users.get(id);
-
-    if (!existingUser || existingUser.isDeleted()) {
+    const existingUser = await this.findById(id);
+    if (!existingUser) {
       return null;
     }
 
-    this.users.set(id, user);
-    return user;
+    await this.repository.update(id, user);
+    return await this.findById(id);
   }
 
   async delete(id: string): Promise<void> {
-    this.users.delete(id);
+    await this.repository.delete(id);
   }
 
   async findAll(): Promise<User[]> {
-    return Array.from(this.users.values());
+    return await this.repository.find({
+      withDeleted: true
+    });
   }
 
   async findAllActive(): Promise<User[]> {
-    return Array.from(this.users.values()).filter(user => !user.isDeleted());
+    return await this.repository.find();
   }
 
   async softDelete(id: string): Promise<User | null> {
-    const user = this.users.get(id);
-    if (!user || user.isDeleted()) {
+    const user = await this.findById(id);
+    if (!user) {
       return null;
     }
 
-    const deletedUser = user.softDelete();
-    this.users.set(id, deletedUser);
-    return deletedUser;
+    await this.repository.softDelete(id);
+    return await this.repository.findOne({
+      where: { id },
+      withDeleted: true
+    });
   }
 }
