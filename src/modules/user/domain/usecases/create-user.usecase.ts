@@ -1,15 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { User } from '../entities/user.entity';
 import { UserRepositoryInterface } from '../repositories/user.repository.interface';
-
-export interface CreateUserRequest {
-  email: string;
-  name: string;
-}
-
-export interface CreateUserResponse {
-  user: User;
-}
+import { CreateUserRequest } from '../interfaces/request/create-request.interface';
+import { UserRole } from 'src/shared/enums/common';
 
 @Injectable()
 export class CreateUserUseCase {
@@ -18,23 +11,24 @@ export class CreateUserUseCase {
     private readonly userRepository: UserRepositoryInterface,
   ) { }
 
-  async execute(request: CreateUserRequest): Promise<CreateUserResponse> {
+  async execute(request: CreateUserRequest): Promise<User> {
     const existingUser = await this.userRepository.findByEmail(request.email);
     if (existingUser) {
       throw new Error('User with this email already exists');
     }
 
     const user = User.create(
-      '',
+      crypto.randomUUID(),
       request.email,
-      request.name,
-      '', 
+      request.nickName,
+      '',
+      '',
+      0,
+      0,
+      0,
+      [UserRole.USER],
     );
 
-    const savedUser = await this.userRepository.save(user);
-
-    return {
-      user: savedUser,
-    };
+    return await this.userRepository.save(user);
   }
 }

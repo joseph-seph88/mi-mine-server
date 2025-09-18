@@ -33,7 +33,6 @@ export class AuthController {
     }
 
     @Post(AppRoute.AUTH_REFRESH)
-    @Public()
     @HttpCode(HttpStatus.OK)
     @ApiCommonResponses('토큰 갱신', RefreshResponseDto)
     async refreshToken(@Body() refreshTokenDto: RefreshTokenDto): Promise<RefreshResponseDto> {

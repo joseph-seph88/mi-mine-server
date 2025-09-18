@@ -1,29 +1,57 @@
-import { Injectable, Inject, UnauthorizedException, ConflictException } from '@nestjs/common';
+import { Injectable, Inject, UnauthorizedException, ConflictException, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { CreateUserUseCase, CreateUserRequest } from '../../domain/usecases/create-user.usecase';
-import { CreateUserDto } from '../dtos/create-user.dto';
-import { UserResponseDto } from '../dtos/user-response.dto';
-import { UserMapper } from '../mappers/user.mapper';
+import { CreateUserUseCase } from '../../domain/usecases/create-user.usecase';
+import { CreateUserRequest } from '../../domain/interfaces/request/create-request.interface';
+import { UserResponseDto } from '../../presentation/dtos/user-response.dto';
 import { User } from '../../domain/entities/user.entity';
 import { UserRepositoryInterface } from '../../domain/repositories/user.repository.interface';
 import { UserRole } from '../../../../shared/enums/common/user-role.enum';
+import { UpdateUserUseCase } from '../../domain/usecases/update-user.usecase';
+import { UpdateUserRequest } from '../../domain/interfaces/request/update-request.interface';
+import { DeleteUserUseCase } from '../../domain/usecases/delete-user.usecase';
+import { GetUserUseCase } from '../../domain/usecases/get-user.usecase';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly createUserUseCase: CreateUserUseCase,
+    private readonly updateUserUseCase: UpdateUserUseCase,
+    private readonly deleteUserUseCase: DeleteUserUseCase,
+    private readonly getUserUseCase: GetUserUseCase,
     @Inject('UserRepository')
     private readonly userRepository: UserRepositoryInterface,
   ) { }
 
-  async createUser(createUserDto: CreateUserDto): Promise<UserResponseDto> {
+  async createUser(createUserDto: any): Promise<UserResponseDto> {
     const request: CreateUserRequest = {
       email: createUserDto.email,
-      name: createUserDto.name,
+      nickName: createUserDto.nickName,
     };
 
-    const response = await this.createUserUseCase.execute(request);
-    return UserMapper.toResponseDto(response.user);
+    const user = await this.createUserUseCase.execute(request);
+    return this.mapUserToResponseDto(user);
+  }
+
+  async getUserById(id: string): Promise<UserResponseDto> {
+    const user = await this.getUserUseCase.execute(id);
+    return this.mapUserToResponseDto(user);
+  }
+
+  async deleteUser(id: string): Promise<void> {
+    await this.deleteUserUseCase.execute(id);
+  }
+
+  async updateUser(id: string, userRequestDto: any): Promise<UserResponseDto> {
+    const request: UpdateUserRequest = {
+      nickName: userRequestDto.nickName,
+      profileImageUrl: userRequestDto.profileImageUrl,
+      friendCount: userRequestDto.friendCount,
+      followerCount: userRequestDto.followerCount,
+      postCount: userRequestDto.postCount,
+    };
+
+    const updatedUser = await this.updateUserUseCase.updateProfile(id, request);
+    return this.mapUserToResponseDto(updatedUser);
   }
 
   async validateUserCredentials(email: string, password: string): Promise<User> {
@@ -38,10 +66,6 @@ export class UserService {
     }
 
     return user;
-  }
-
-  async findUserById(id: string): Promise<User | null> {
-    return await this.userRepository.findById(id);
   }
 
   async findUserByEmail(email: string): Promise<User | null> {
@@ -69,5 +93,19 @@ export class UserService {
     );
 
     return await this.userRepository.save(user);
+  }
+
+  private mapUserToResponseDto(user: User): UserResponseDto {
+    return new UserResponseDto(
+      user.id,
+      user.email,
+      user.nickName,
+      user.profileImageUrl,
+      user.friendCount,
+      user.followerCount,
+      user.postCount,
+      user.createdAt,
+      user.updatedAt,
+    );
   }
 }

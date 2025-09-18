@@ -12,11 +12,11 @@ export const API_TAGS = {
 // 컨트롤러 경로 (영어)
 export const CONTROLLERS = {
     AUTH: 'auth',
-    USER: 'users',
-    POST: 'posts',
+    USER: 'user',
+    POST: 'post',
     COMMUNITY: 'community',
     MAP: 'map',
-    PLACE: 'places',
+    PLACE: 'place',
 } as const;
 
 // API 버전
