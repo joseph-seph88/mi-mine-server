@@ -1,9 +1,10 @@
 import { DatabaseConfig } from '../interfaces/database.interface';
+import { ConfigService } from '@nestjs/config';
 
-export const databaseConfig: DatabaseConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432'),
-  username: process.env.DB_USERNAME || 'postgres',
-  password: process.env.DB_PASSWORD || 'password',
-  database: process.env.DB_DATABASE || 'mimine_db',
-};
+export const databaseConfigFactory = (configService: ConfigService): DatabaseConfig => ({
+  host: configService.get<string>('DB_HOST', 'localhost'),
+  port: configService.get<number>('DB_PORT', 5432),
+  username: configService.get<string>('DB_USER', 'joseph'),
+  password: configService.get<string>('DB_PASS', ''),
+  database: configService.get<string>('DB_DATABASE', ''),
+});

@@ -1,23 +1,49 @@
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
 import { UserRole } from '../../../../shared/enums/common/user-role.enum';
 
+@Entity('users')
 export class User {
-  constructor(
-    public readonly id: string,
-    public readonly email: string,
-    public readonly nickName: string,
-    public readonly password: string,
-    public readonly profileImageUrl: string,
-    public readonly friendCount: number,
-    public readonly followerCount: number,
-    public readonly postCount: number,
-    public readonly roles: UserRole[],
-    public readonly createdAt: Date,
-    public readonly updatedAt: Date,
-    public readonly deletedAt: Date | null,
-  ) { }
+  @PrimaryGeneratedColumn('uuid')
+  public id: string;
+
+  @Column({ unique: true })
+  public email: string;
+
+  @Column()
+  public nickName: string;
+
+  @Column()
+  public password: string;
+
+  @Column({ default: '' })
+  public profileImageUrl: string;
+
+  @Column({ default: 0 })
+  public friendCount: number;
+
+  @Column({ default: 0 })
+  public followerCount: number;
+
+  @Column({ default: 0 })
+  public postCount: number;
+
+  @Column('simple-array')
+  public roles: UserRole[];
+
+  @CreateDateColumn()
+  public createdAt: Date;
+
+  @UpdateDateColumn()
+  public updatedAt: Date;
+
+  @DeleteDateColumn()
+  public deletedAt: Date | null;
+
+  constructor() {
+    // TypeORM will handle initialization
+  }
 
   static create(
-    id: string,
     email: string,
     nickName: string,
     password: string,
@@ -27,72 +53,28 @@ export class User {
     postCount?: number,
     roles?: UserRole[],
   ): User {
-    const now = new Date();
-    return new User(
-      id,
-      email,
-      nickName,
-      password || '',
-      profileImageUrl || '',
-      friendCount || 0,
-      followerCount || 0,
-      postCount || 0,
-      roles || [UserRole.USER],
-      now,
-      now,
-      null
-    );
+    const user = new User();
+    user.email = email;
+    user.nickName = nickName;
+    user.password = password;
+    user.profileImageUrl = profileImageUrl || '';
+    user.friendCount = friendCount || 0;
+    user.followerCount = followerCount || 0;
+    user.postCount = postCount || 0;
+    user.roles = roles || [UserRole.USER];
+    return user;
   }
 
-  updateNickName(nickName: string): User {
-    return new User(
-      this.id,
-      this.email,
-      nickName,
-      this.password,
-      this.profileImageUrl,
-      this.friendCount,
-      this.followerCount,
-      this.postCount,
-      this.roles,
-      this.createdAt,
-      new Date(),
-      this.deletedAt,
-    );
+  updateNickName(nickName: string): void {
+    this.nickName = nickName;
   }
 
-  updatePassword(password: string): User {
-    return new User(
-      this.id,
-      this.email,
-      this.nickName,
-      password,
-      this.profileImageUrl,
-      this.friendCount,
-      this.followerCount,
-      this.postCount,
-      this.roles,
-      this.createdAt,
-      new Date(),
-      this.deletedAt,
-    );
+  updatePassword(password: string): void {
+    this.password = password;
   }
 
-  softDelete(): User {
-    return new User(
-      this.id,
-      this.email,
-      this.nickName,
-      this.password,
-      this.profileImageUrl,
-      this.friendCount,
-      this.followerCount,
-      this.postCount,
-      this.roles,
-      this.createdAt,
-      new Date(),
-      new Date(),
-    );
+  softDelete(): void {
+    this.deletedAt = new Date();
   }
   isDeleted(): boolean {
     return this.deletedAt !== null;
@@ -101,58 +83,32 @@ export class User {
   updateProfile(updates: {
     nickName?: string;
     profileImageUrl?: string;
-  }): User {
-    return new User(
-      this.id,
-      this.email,
-      updates.nickName ?? this.nickName,
-      this.password,
-      updates.profileImageUrl ?? this.profileImageUrl,
-      this.friendCount,
-      this.followerCount,
-      this.postCount,
-      this.roles,
-      this.createdAt,
-      new Date(),
-      this.deletedAt,
-    );
+  }): void {
+    if (updates.nickName !== undefined) {
+      this.nickName = updates.nickName;
+    }
+    if (updates.profileImageUrl !== undefined) {
+      this.profileImageUrl = updates.profileImageUrl;
+    }
   }
 
   updateCounts(updates: {
     friendCount?: number;
     followerCount?: number;
     postCount?: number;
-  }): User {
-    return new User(
-      this.id,
-      this.email,
-      this.nickName,
-      this.password,
-      this.profileImageUrl,
-      updates.friendCount ?? this.friendCount,
-      updates.followerCount ?? this.followerCount,
-      updates.postCount ?? this.postCount,
-      this.roles,
-      this.createdAt,
-      new Date(),
-      this.deletedAt,
-    );
+  }): void {
+    if (updates.friendCount !== undefined) {
+      this.friendCount = updates.friendCount;
+    }
+    if (updates.followerCount !== undefined) {
+      this.followerCount = updates.followerCount;
+    }
+    if (updates.postCount !== undefined) {
+      this.postCount = updates.postCount;
+    }
   }
 
-  updateRoles(roles: UserRole[]): User {
-    return new User(
-      this.id,
-      this.email,
-      this.nickName,
-      this.password,
-      this.profileImageUrl,
-      this.friendCount,
-      this.followerCount,
-      this.postCount,
-      roles,
-      this.createdAt,
-      new Date(),
-      this.deletedAt,
-    );
+  updateRoles(roles: UserRole[]): void {
+    this.roles = roles;
   }
 }

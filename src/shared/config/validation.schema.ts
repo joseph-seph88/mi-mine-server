@@ -13,4 +13,28 @@ export const validationSchema = Joi.object({
     JWT_EXPIRES_IN: Joi.string()
         .default('1h')
         .description('JWT 토큰 만료 시간'),
+
+    // Database configuration
+    DB_HOST: Joi.string()
+        .default('localhost')
+        .description('Database host'),
+
+    DB_PORT: Joi.number()
+        .min(1)
+        .max(65535)
+        .default(5432)
+        .description('Database port'),
+
+    DB_USER: Joi.string()
+        .required()
+        .description('Database user'),
+
+    DB_PASS: Joi.string()
+        .allow('')
+        .default('')
+        .description('Database password'),
+
+    DB_DATABASE: Joi.string()
+        .required()
+        .description('Database name'),
 });
