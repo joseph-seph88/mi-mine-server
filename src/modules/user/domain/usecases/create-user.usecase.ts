@@ -25,9 +25,10 @@ export class CreateUserUseCase {
     }
 
     const user = User.create(
-      this.generateId(),
+      '',
       request.email,
       request.name,
+      '', 
     );
 
     const savedUser = await this.userRepository.save(user);
@@ -35,9 +36,5 @@ export class CreateUserUseCase {
     return {
       user: savedUser,
     };
-  }
-
-  private generateId(): string {
-    return Math.random().toString(36).substr(2, 9);
   }
 }

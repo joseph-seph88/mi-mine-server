@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { JwtPayload } from '../../interfaces/jwt-payload.interface';
-import { AuthUser } from '../../interfaces/auth-user.interface';
+import { UserInfo } from '../../../modules/user/domain/interfaces/user-info.interface';
 import { AUTH_MESSAGES, JWT_CONSTANTS } from '../../constants/auth.constants';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         });
     }
 
-    async validate(payload: JwtPayload): Promise<AuthUser> {
+    async validate(payload: JwtPayload): Promise<UserInfo> {
         if (!payload.sub || !payload.email) {
             throw new UnauthorizedException(AUTH_MESSAGES.INVALID_PAYLOAD);
         }
@@ -29,7 +29,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         return {
             id: payload.sub,
             email: payload.email,
-            name: payload.name || '',
+            nickName: payload.name || '',
+            profileImageUrl: '',
+            friendCount: 0,
+            followerCount: 0,
+            postCount: 0,
             roles: payload.roles || [],
         };
     }
