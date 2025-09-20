@@ -34,7 +34,29 @@ export const validationSchema = Joi.object({
         .default('')
         .description('Database password'),
 
-    DB_DATABASE: Joi.string()
+    DB_NAME: Joi.string()
         .required()
         .description('Database name'),
+
+    // Redis configuration
+    REDIS_HOST: Joi.string()
+        .default('localhost')
+        .description('Redis host'),
+
+    REDIS_PORT: Joi.number()
+        .min(1)
+        .max(65535)
+        .default(6379)
+        .description('Redis port'),
+
+    REDIS_PASSWORD: Joi.string()
+        .allow('')
+        .default('')
+        .description('Redis password'),
+
+    REDIS_DB: Joi.number()
+        .min(0)
+        .max(15)
+        .default(0)
+        .description('Redis database number'),
 });

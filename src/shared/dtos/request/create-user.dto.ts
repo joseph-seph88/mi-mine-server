@@ -1,4 +1,4 @@
-export interface RegisterRequestInterface {
+export class CreateUserDto {
     email: string;
     password: string;
     nickName: string;

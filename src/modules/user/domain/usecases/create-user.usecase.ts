@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from '../entities/user.entity';
+import { User } from '../../../../shared/entities/user.entity';
 import { CreateUserRequest } from '../interfaces/request/create-request.interface';
 import { UserRole } from 'src/shared/enums/common';
 

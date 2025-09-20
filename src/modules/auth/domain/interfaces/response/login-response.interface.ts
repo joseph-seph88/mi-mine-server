@@ -1,4 +1,4 @@
-export interface LoginResponse {
+export interface LoginResponseInterface {
     accessToken: string;
     refreshToken: string;
     user: {
@@ -9,5 +9,8 @@ export interface LoginResponse {
         friendCount: number;
         followerCount: number;
         postCount: number;
+        friendIdList: string[];
+        followerIdList: string[];
+        roles: string[];
     };
 }

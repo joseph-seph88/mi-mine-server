@@ -1,7 +1,7 @@
 import { applyDecorators, Type } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiExtraModels, getSchemaPath } from '@nestjs/swagger';
 import { RESPONSE_MESSAGES } from '../../constants/messages.constants';
-import { ApiResponseDto } from '../../dtos/api-response.dto';
+import { ApiResponseDto } from '../../dtos/response/api-response.dto';
 
 interface ApiResponseOptions {
     includeAuth?: boolean;

@@ -1,47 +1,34 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthController } from './presentation/controllers/auth.controller';
 import { AuthService } from './application/services/auth.service';
-import { JwtTokenGenerator } from './infrastructure/services/jwt-token-generator.service';
 import { LoginUseCase } from './domain/usecases/login.usecase';
 import { RegisterUseCase } from './domain/usecases/register.usecase';
 import { RefreshTokenUseCase } from './domain/usecases/refresh-token.usecase';
-import { AuthRepository } from './infrastructure/repositories/auth.repository';
-import { UserAdapter } from './infrastructure/adapters/user.adapter';
-import { AuthUserService } from './infrastructure/services/auth-user.service';
-import { UserModule } from '../user/user.module';
-import { User } from '../user/domain/entities/user.entity';
-import { JwtAuthModule } from '../../shared/auth/jwt-auth.module';
-
+import { JwtAuthModule } from '../../shared/modules/jwt-auth.module';
+import { RedisService } from '../../shared/services/redis.service';
+import { SharedUserService } from '../../shared/services/shared-user.service';
+import { AuthTokenRepositoryImpl } from './infrastructure/repositories/auth-token.repository.impl';
+import { AuthUserRepositoryImpl } from './infrastructure/repositories/auth-user.repository.impl';
+import { DeleteTokenUseCase } from './domain/usecases/delete-token.usecase';
 @Module({
     imports: [
         ConfigModule,
         JwtAuthModule,
-        UserModule,
-        TypeOrmModule.forFeature([User]),
     ],
     controllers: [AuthController],
     providers: [
         AuthService,
-        AuthUserService,
+        RedisService,
+        SharedUserService,
 
         LoginUseCase,
         RegisterUseCase,
         RefreshTokenUseCase,
+        DeleteTokenUseCase,
 
-        {
-            provide: 'AuthRepository',
-            useClass: AuthRepository,
-        },
-        {
-            provide: 'TokenGenerator',
-            useClass: JwtTokenGenerator,
-        },
-        {
-            provide: 'UserPort',
-            useClass: UserAdapter,
-        },
+        AuthTokenRepositoryImpl,
+        AuthUserRepositoryImpl,
     ],
     exports: [AuthService],
 })
