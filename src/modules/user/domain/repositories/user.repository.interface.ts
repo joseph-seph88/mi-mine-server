@@ -1,4 +1,4 @@
-import { User } from '../entities/user.entity';
+import { User } from '../../../../shared/entities/user.entity';
 
 export interface UserRepositoryInterface {
   findById(id: string): Promise<User | null>;

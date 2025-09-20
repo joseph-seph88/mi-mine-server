@@ -26,6 +26,7 @@
 - **NestJS**: v11.0.7 (프레임워크)
 - **TypeScript**: v5.7.3 (언어)
 - **Package Manager**: npm v11.0.0
+- **Database**: PostgreSQL, Redis
 
 #### 개발 도구
 - **ESLint**: 코드 품질 관리
