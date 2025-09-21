@@ -12,7 +12,7 @@ import { typeOrmConfigFactory } from './shared/config/typeorm.config';
 import { JwtAuthGuard } from './shared/security/guards/jwt-auth.guard';
 import { RolesGuard } from './shared/security/guards/roles.guard';
 import { PostModule } from './modules/post/post.module';
-import { CommunityModule } from './modules/community/community.module';
+import { CommentModule } from './modules/comment/comment.module';
 import { DatabaseModule } from './shared/modules/database.module';
 import { RedisModule } from './shared/modules/redis.module';
 import { JwtAuthModule } from './shared/modules/jwt-auth.module';
@@ -31,7 +31,7 @@ import { JwtAuthModule } from './shared/modules/jwt-auth.module';
     AuthModule,
     UserModule,
     PostModule,
-    CommunityModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [

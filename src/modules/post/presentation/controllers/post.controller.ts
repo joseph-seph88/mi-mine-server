@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, HttpStatus, HttpCode } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, HttpStatus, HttpCode, Query } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { PostService } from '../../application/services/post.service';
 import { API_TAGS, CONTROLLERS } from 'src/shared/constants/api.constants';
 import { ApiCreateResponse, ApiDeleteResponse, ApiGetResponse, ApiUpdateResponse } from 'src/shared/decorators/swagger/api-response.decorator';
@@ -39,8 +39,21 @@ export class PostController {
   @Get(AppRoute.POST_GET_BY_POST_ID)
   @HttpCode(HttpStatus.OK)
   @ApiGetResponse('게시글 상세 조회')
-  async getPostById(@Param('postId') postId: string) {
-    return await this.postService.getPostById(parseInt(postId));
+  @ApiQuery({ name: 'includeComments', required: false, description: '댓글 포함 여부', example: false })
+  @ApiQuery({ name: 'commentLimit', required: false, description: '댓글 개수 제한', example: 10 })
+  async getPostById(
+    @Param('postId') postId: string,
+    @Query('includeComments') includeComments?: string,
+    @Query('commentLimit') commentLimit?: string,
+  ) {
+    const shouldIncludeComments = includeComments === 'true';
+    const commentLimitNum = commentLimit ? parseInt(commentLimit) : 10;
+
+    return await this.postService.getPostById(
+      parseInt(postId),
+      shouldIncludeComments,
+      commentLimitNum
+    );
   }
 
   @Patch(AppRoute.POST_UPDATE)

@@ -40,8 +40,8 @@ export class PostService {
     return await this.getPostByUserIdUseCase.execute(userId);
   }
 
-  async getPostById(postId: number): Promise<PostResponseDto> {
-    return await this.getPostByIdUseCase.execute(postId);
+  async getPostById(postId: number, includeComments?: boolean, commentLimit?: number): Promise<PostResponseDto> {
+    return await this.getPostByIdUseCase.execute(postId, includeComments, commentLimit);
   }
 
   async updatePost(postId: number, postRequestDto: PostRequestDto): Promise<PostResponseDto> {
