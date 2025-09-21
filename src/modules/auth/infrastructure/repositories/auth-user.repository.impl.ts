@@ -7,8 +7,10 @@ import { UserInfoInterface } from "../../domain/interfaces/types/user-info.inter
 
 
 @Injectable()
-export class AuthUserRepositoryImpl implements AuthUserRepository {
-    constructor(private userService: SharedUserService) { }
+export class AuthUserRepositoryImpl extends AuthUserRepository {
+    constructor(private userService: SharedUserService) {
+        super();
+    }
 
 
     async registerUser(userData: RegisterRequestInterface): Promise<Boolean> {

@@ -28,10 +28,10 @@ export class User {
   @Column({ default: 0 })
   postCount: number;
 
-  @Column('simple-array')
+  @Column('simple-array', { default: () => "''" })
   friendIdList: string[];
 
-  @Column('simple-array')
+  @Column('simple-array', { default: () => "''" })
   followerIdList: string[];
 
   @Column('simple-array')

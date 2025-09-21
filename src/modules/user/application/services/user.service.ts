@@ -1,57 +1,27 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { User } from '../../../../shared/entities/user.entity';
+import { Injectable } from '@nestjs/common';
 import { UserResponseDto } from '../../presentation/dtos/user-response.dto';
-import { CreateUserUseCase } from '../../domain/usecases/create-user.usecase';
 import { UpdateUserUseCase } from '../../domain/usecases/update-user.usecase';
 import { GetUserUseCase } from '../../domain/usecases/get-user.usecase';
 import { DeleteUserUseCase } from '../../domain/usecases/delete-user.usecase';
+import { UserRequestDto } from 'src/shared/dtos/request/user-request.dto';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-    private readonly createUserUseCase: CreateUserUseCase,
     private readonly updateUserUseCase: UpdateUserUseCase,
     private readonly getUserUseCase: GetUserUseCase,
     private readonly deleteUserUseCase: DeleteUserUseCase,
   ) { }
 
-  async createUser(createUserDto: any): Promise<UserResponseDto> {
-    return await this.createUserUseCase.execute(createUserDto);
-  }
-
   async getUserById(id: string): Promise<UserResponseDto> {
-    const user = await this.getUserUseCase.execute(id);
-    return this.mapUserToResponseDto(user);
+    return await this.getUserUseCase.execute(id);
   }
 
-  async updateUser(id: string, updateUserDto: any): Promise<UserResponseDto> {
-    const updatedUser = await this.updateUserUseCase.updateProfile(id, updateUserDto);
-    return this.mapUserToResponseDto(updatedUser);
+  async updateUser(id: string, updateUserDto: UserRequestDto): Promise<UserResponseDto> {
+    return await this.updateUserUseCase.updateProfile(id, updateUserDto);
   }
 
   async deleteUser(id: string): Promise<void> {
-    const result = await this.userRepository.softDelete(id);
-    if (result.affected === 0) {
-      throw new NotFoundException(`사용자를 찾을 수 없습니다. ID: ${id}`);
-    }
-  }
-
-
-  private mapUserToResponseDto(user: User): UserResponseDto {
-    return new UserResponseDto(
-      user.id,
-      user.email,
-      user.nickName,
-      user.profileImageUrl,
-      user.friendCount,
-      user.followerCount,
-      user.postCount,
-      user.createdAt,
-      user.updatedAt
-    );
+    await this.deleteUserUseCase.execute(id);
   }
 }

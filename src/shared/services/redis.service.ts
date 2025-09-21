@@ -46,9 +46,6 @@ export class RedisService implements OnModuleInit {
         }
     }
 
-    /**
-     * 사용자 ID로 세션 조회
-     */
     async getSessionByUserId(userId: string): Promise<UserSession | null> {
         const key = `session:${userId}`;
         const sessionData = await this.redis.get(key);
@@ -60,38 +57,11 @@ export class RedisService implements OnModuleInit {
         return this.parseSessionData(sessionData);
     }
 
-    /**
-     * 리프레시 토큰으로 세션 조회
-     */
-    async getSessionByRefreshToken(refreshToken: string): Promise<UserSession | null> {
-        // 모든 세션 키를 조회하여 리프레시 토큰으로 검색
-        const keys = await this.redis.keys('session:*');
-
-        for (const key of keys) {
-            const sessionData = await this.redis.get(key);
-            if (sessionData && typeof sessionData === 'string') {
-                const parsed = JSON.parse(sessionData);
-                if (parsed.refreshToken === refreshToken) {
-                    return this.parseSessionData(sessionData);
-                }
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * 세션 삭제 (사용자 ID로)
-     */
     async deleteSessionByUserId(userId: string): Promise<void> {
         const key = `session:${userId}`;
         await this.redis.del(key);
     }
 
-
-    /**
-     * 만료된 세션들 정리
-     */
     async cleanupExpiredSessions(): Promise<number> {
         const keys = await this.redis.keys('session:*');
         let deletedCount = 0;
