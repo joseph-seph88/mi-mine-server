@@ -44,7 +44,7 @@ export class PostRepositoryImpl implements PostRepository {
         return entities.map(entity => entity.toInterface());
     }
 
-    async getPostById(postId: number): Promise<PostResponseInterface> {
+    async getPostById(postId: number, includeComments?: boolean, commentLimit?: number): Promise<PostResponseInterface> {
         const postEntity = await this.postRepository.findOne({ where: { postId: postId } });
 
         if (!postEntity) {

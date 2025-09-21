@@ -6,7 +6,7 @@ import { PostResponseInterface } from '../interfaces/post-response.interface';
 export class GetPostByIdUseCase {
     constructor(private readonly postRepository: PostRepository) { }
 
-    async execute(postId: number): Promise<PostResponseInterface> {
-        return await this.postRepository.getPostById(postId);
+    async execute(postId: number, includeComments?: boolean, commentLimit?: number): Promise<PostResponseInterface> {
+        return await this.postRepository.getPostById(postId, includeComments, commentLimit);
     }
 }
