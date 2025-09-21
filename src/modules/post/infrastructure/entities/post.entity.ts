@@ -32,6 +32,12 @@ export class PostEntity {
     @UpdateDateColumn()
     updatedAt: Date;
 
+    @Column({ default: 0 })
+    latitude: number;
+
+    @Column({ default: 0 })
+    longitude: number;
+
     static fromRequestData(data: PostRequestInterface): PostEntity {
         const entity = new PostEntity();
         entity.title = data.title ?? '';
@@ -51,6 +57,8 @@ export class PostEntity {
             commentCount: this.commentCount,
             createdAt: this.createdAt,
             updatedAt: this.updatedAt,
+            latitude: this.latitude,
+            longitude: this.longitude,
         };
     }
 }

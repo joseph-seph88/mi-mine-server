@@ -8,6 +8,8 @@ import { PostRequestDto } from '../../presentation/dtos/request/post-request.dto
 import { PostResponseDto } from '../../presentation/dtos/response/post-response.dto';
 import { CreatePostUseCase } from '../../domain/usecases/create-post.usecase';
 import { PostRequestInterface } from '../../domain/interfaces/post-request.interface';
+import { PostRadiusRequestDto } from '../../presentation/dtos/request/post-radius-request.dto';
+import { GetPostByRadiusUseCase } from '../../domain/usecases/get-post-by-radius.usecase';
 
 @Injectable()
 export class PostService {
@@ -18,6 +20,7 @@ export class PostService {
     private readonly getPostByIdUseCase: GetPostByIdUseCase,
     private readonly updatePostUseCase: UpdatePostUseCase,
     private readonly deletePostUseCase: DeletePostUseCase,
+    private readonly getPostByRadiusUseCase: GetPostByRadiusUseCase,
   ) { }
 
   async createPost(postRequestDto: PostRequestDto, userId: string): Promise<PostResponseDto> {
@@ -47,5 +50,9 @@ export class PostService {
 
   async deletePost(postId: number): Promise<void> {
     await this.deletePostUseCase.execute(postId);
+  }
+
+  async getPostsByRadius(postRadiusRequestDto: PostRadiusRequestDto): Promise<PostResponseDto[]> {
+    return await this.getPostByRadiusUseCase.execute(postRadiusRequestDto);
   }
 }
