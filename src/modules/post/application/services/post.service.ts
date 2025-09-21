@@ -1,63 +1,51 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Post } from '../../domain/entities/post.entity';
-import { CreatePostDto } from '../../presentation/dtos/create-post.dto';
-import { UpdatePostDto } from '../../presentation/dtos/update-post.dto';
+import { Injectable } from '@nestjs/common';
+import { UpdatePostUseCase } from '../../domain/usecases/update-post.usecase';
+import { DeletePostUseCase } from '../../domain/usecases/delete-post.usecase';
+import { GetAllPostsUseCase } from '../../domain/usecases/get-all-post.usecase';
+import { GetPostByUserIdUseCase } from '../../domain/usecases/get-post-by-user-id.usecase';
+import { GetPostByIdUseCase } from '../../domain/usecases/get-post-by-id.usecase';
+import { PostRequestDto } from '../../presentation/dtos/request/post-request.dto';
+import { PostResponseDto } from '../../presentation/dtos/response/post-response.dto';
+import { CreatePostUseCase } from '../../domain/usecases/create-post.usecase';
+import { PostRequestInterface } from '../../domain/interfaces/post-request.interface';
 
 @Injectable()
 export class PostService {
   constructor(
-    @InjectRepository(Post)
-    private readonly postRepository: Repository<Post>,
+    private readonly createPostUseCase: CreatePostUseCase,
+    private readonly getAllPostsUseCase: GetAllPostsUseCase,
+    private readonly getPostByUserIdUseCase: GetPostByUserIdUseCase,
+    private readonly getPostByIdUseCase: GetPostByIdUseCase,
+    private readonly updatePostUseCase: UpdatePostUseCase,
+    private readonly deletePostUseCase: DeletePostUseCase,
   ) { }
 
-  async create(createPostDto: CreatePostDto, userId: string): Promise<Post> {
-    const post = Post.create(
-      createPostDto.title,
-      createPostDto.content,
-      userId,
-    );
-    return await this.postRepository.save(post);
+  async createPost(postRequestDto: PostRequestDto, userId: string): Promise<PostResponseDto> {
+    const postData: PostRequestInterface = {
+      title: postRequestDto.title || '',
+      content: postRequestDto.content || '',
+      imageUrl: postRequestDto.imageUrl || '',
+    };
+    return await this.createPostUseCase.execute(postData);
   }
 
-  async findAll(): Promise<Post[]> {
-    return await this.postRepository.find({ order: { createdAt: 'DESC' } });
+  async getAllPosts(): Promise<PostResponseDto[]> {
+    return await this.getAllPostsUseCase.execute();
   }
 
-  async findOne(id: string): Promise<Post> {
-    const post = await this.postRepository.findOne({ where: { id } });
-    if (!post) {
-      throw new NotFoundException(`게시글을 찾을 수 없습니다. ID: ${id}`);
-    }
-    return post;
+  async getPostByUserId(userId: string): Promise<PostResponseDto[]> {
+    return await this.getPostByUserIdUseCase.execute(userId);
   }
 
-  async findByUserId(userId: string): Promise<Post[]> {
-    return await this.postRepository.find({
-      where: { userId },
-      order: { createdAt: 'DESC' }
-    });
+  async getPostById(postId: number): Promise<PostResponseDto> {
+    return await this.getPostByIdUseCase.execute(postId);
   }
 
-  async update(id: string, updatePostDto: UpdatePostDto): Promise<Post> {
-    const post = await this.findOne(id);
-
-    if (updatePostDto.title !== undefined && updatePostDto.content !== undefined) {
-      post.updateContent(updatePostDto.title, updatePostDto.content);
-    }
-
-    return await this.postRepository.save(post);
+  async updatePost(postId: number, postRequestDto: PostRequestDto): Promise<PostResponseDto> {
+    return await this.updatePostUseCase.execute(postId, postRequestDto);
   }
 
-  async remove(id: string): Promise<void> {
-    const result = await this.postRepository.softDelete(id);
-    if (result.affected === 0) {
-      throw new NotFoundException(`게시글을 찾을 수 없습니다. ID: ${id}`);
-    }
-  }
-
-  async getPostCount(): Promise<number> {
-    return await this.postRepository.count();
+  async deletePost(postId: number): Promise<void> {
+    await this.deletePostUseCase.execute(postId);
   }
 }
