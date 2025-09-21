@@ -1,4 +1,4 @@
-export interface UserResponse {
+export interface UserResponseInterface {
     id: string;
     email: string;
     nickName: string;
@@ -7,11 +7,9 @@ export interface UserResponse {
     followerCount: number;
     postCount: number;
     roles?: string[];
-}
-
-export interface UserInfo {
-    id: string;
-    email: string;
-    nickName: string;
-    roles: string[];
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt: Date | null;
+    friendIdList: string[];
+    followerIdList: string[];
 }

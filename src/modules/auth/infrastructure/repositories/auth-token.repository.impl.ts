@@ -7,14 +7,17 @@ import { UserTokenInterface } from '../../domain/interfaces/types/user-token.int
 import { JwtPayload } from '../../../../shared/interfaces/jwt-payload.interface';
 import { JWT_CONSTANTS } from '../../../../shared/constants/auth.constants';
 import { UserSession } from 'src/shared/entities/user-session.entity';
+import { TimeUtil } from '../../../../shared/utils/time.util';
 
 @Injectable()
-export class AuthTokenRepositoryImpl implements AuthTokenRepository {
+export class AuthTokenRepositoryImpl extends AuthTokenRepository {
     constructor(
         private redisService: RedisService,
         private readonly jwtService: JwtService,
         private readonly configService: ConfigService,
-    ) { }
+    ) {
+        super();
+    }
 
     async generateAndSaveTokens(userId: string, email: string): Promise<UserTokenInterface> {
         const tokens = await this.generateTokens(userId, email);
@@ -94,26 +97,11 @@ export class AuthTokenRepositoryImpl implements AuthTokenRepository {
             }),
         ]);
 
-        const expiresIn = this.parseExpiresIn(
+        const expiresIn = TimeUtil.parseToSeconds(
             this.configService.get<string>(JWT_CONSTANTS.ACCESS_EXPIRES_IN, '30m')
         );
 
         return { accessToken, refreshToken, expiresIn };
     }
 
-    private parseExpiresIn(expiresIn: string): number {
-        const match = expiresIn.match(/^(\d+)([smhd])$/);
-        if (!match) return 900;
-
-        const value = parseInt(match[1]);
-        const unit = match[2];
-
-        switch (unit) {
-            case 's': return value;
-            case 'm': return value * 60;
-            case 'h': return value * 60 * 60;
-            case 'd': return value * 24 * 60 * 60;
-            default: return 900;
-        }
-    }
 }

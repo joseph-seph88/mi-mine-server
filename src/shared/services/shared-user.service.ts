@@ -2,7 +2,7 @@ import { ConflictException, Injectable, NotFoundException, UnauthorizedException
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
-import { UpdateUserDto } from '../dtos/request/update-user.dto';
+import { UserRequestDto } from '../dtos/request/user-request.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -41,14 +41,14 @@ export class SharedUserService {
         return this.userRepository.findOneBy({ id: parseInt(id) });
     }
 
-    async updateUser(userData: UpdateUserDto): Promise<User> {
-        const existingUser = await this.userRepository.existsBy({ id: userData.id });
+    async updateUser(id: number, userData: UserRequestDto): Promise<User> {
+        const existingUser = await this.userRepository.existsBy({ id: id });
         if (!existingUser) {
-            throw new NotFoundException(`사용자를 찾을 수 없습니다. ID: ${userData.id}`);
+            throw new NotFoundException(`사용자를 찾을 수 없습니다. ID: ${id}`);
         }
 
-        await this.userRepository.update(userData.id, userData);
-        const updatedUser = await this.userRepository.findOneBy({ id: userData.id });
+        await this.userRepository.update(id, userData);
+        const updatedUser = await this.userRepository.findOneBy({ id: id });
         if (!updatedUser) {
             throw new NotFoundException(`사용자 데이터가 없습니다.`);
         }
@@ -79,6 +79,4 @@ export class SharedUserService {
 
         return user;
     }
-
-
 }
