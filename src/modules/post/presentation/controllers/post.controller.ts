@@ -7,6 +7,7 @@ import { AppRoute } from 'src/shared/enums/common';
 import { PostRequestDto } from '../dtos/request/post-request.dto';
 import { CurrentUser } from 'src/shared/decorators/current-user.decorator';
 import { JwtPayload } from 'src/shared/interfaces/jwt-payload.interface';
+import { PostRadiusRequestDto } from '../dtos/request/post-radius-request.dto';
 
 @ApiTags(API_TAGS.POST)
 @ApiBearerAuth()
@@ -54,5 +55,12 @@ export class PostController {
   @ApiDeleteResponse('게시글 삭제')
   async deletePost(@Param('postId') postId: string) {
     await this.postService.deletePost(parseInt(postId));
+  }
+
+  @Get(AppRoute.POST_GET_BY_RADIUS)
+  @HttpCode(HttpStatus.OK)
+  @ApiGetResponse('반경 내 게시글 조회')
+  async getPostsByRadius(@Body() postRadiusRequestDto: PostRadiusRequestDto) {
+    return await this.postService.getPostsByRadius(postRadiusRequestDto);
   }
 }

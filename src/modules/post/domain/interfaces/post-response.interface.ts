@@ -8,4 +8,6 @@ export interface PostResponseInterface {
     commentCount: number;
     createdAt: Date;
     updatedAt: Date;
+    latitude?: number;
+    longitude?: number;
 }

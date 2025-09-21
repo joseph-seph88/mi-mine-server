@@ -1,10 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { getDistance } from 'geolib';
 import { PostEntity } from '../entities/post.entity';
 import { PostRepository } from '../../domain/repositories/post.repository';
 import { PostRequestInterface } from '../../domain/interfaces/post-request.interface';
 import { PostResponseInterface } from '../../domain/interfaces/post-response.interface';
+import { PostRadiusRequestInterface } from '../../domain/interfaces/post-radius-request.interface';
 
 @Injectable()
 export class PostRepositoryImpl implements PostRepository {
@@ -74,5 +76,32 @@ export class PostRepositoryImpl implements PostRepository {
         if (result.affected === 0) {
             throw new NotFoundException(`게시글을 찾을 수 없습니다. ID: ${postId}`);
         }
+    }
+
+    async getPostsByRadius(postRadiusRequestInterface: PostRadiusRequestInterface): Promise<PostResponseInterface[]> {
+        const { latitude, longitude, zoom, searchRadius } = postRadiusRequestInterface;
+
+        const nearbyPosts = await this.postRepository
+            .createQueryBuilder('post')
+            .where('post.latitude IS NOT NULL AND post.longitude IS NOT NULL')
+            .getMany();
+
+        const postsWithDistance = nearbyPosts
+            .map(post => {
+                let distance = Infinity;
+
+                if (post.latitude && post.longitude) {
+                    distance = getDistance(
+                        { latitude, longitude },
+                        { latitude: post.latitude, longitude: post.longitude }
+                    );
+                }
+
+                return { post, distance };
+            })
+            .filter(item => item.distance <= searchRadius)
+            .sort((a, b) => a.distance - b.distance);
+
+        return postsWithDistance.map(item => item.post.toInterface());
     }
 }

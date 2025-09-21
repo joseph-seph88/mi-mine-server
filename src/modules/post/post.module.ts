@@ -11,6 +11,7 @@ import { DeletePostUseCase } from './domain/usecases/delete-post.usecase';
 import { UpdatePostUseCase } from './domain/usecases/update-post.usecase';
 import { PostRepositoryImpl } from './infrastructure/repositories/post.repository.impl';
 import { PostRepository } from './domain/repositories/post.repository';
+import { GetPostByRadiusUseCase } from './domain/usecases/get-post-by-radius.usecase';
 
 @Module({
   imports: [TypeOrmModule.forFeature([PostEntity])],
@@ -24,7 +25,8 @@ import { PostRepository } from './domain/repositories/post.repository';
     GetPostByIdUseCase,
     UpdatePostUseCase,
     DeletePostUseCase,
-
+    GetPostByRadiusUseCase,
+    
     {
       provide: PostRepository,
       useClass: PostRepositoryImpl,

@@ -13,4 +13,5 @@ export enum AppRoute {
     POST_GET_BY_POST_ID = 'detail/:postId',
     POST_UPDATE = ':postId',
     POST_DELETE = ':postId',
+    POST_GET_BY_RADIUS = 'radius',
 }
