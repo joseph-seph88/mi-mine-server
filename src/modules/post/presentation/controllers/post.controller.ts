@@ -14,14 +14,14 @@ import { JwtPayload } from 'src/shared/interfaces/jwt-payload.interface';
 export class PostController {
   constructor(private readonly postService: PostService) { }
 
-  @Post(AppRoute.POST_CREATE)
+  @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiCreateResponse('게시글 생성')
   async createPost(@Body() postRequestDto: PostRequestDto, @Req() req: any) {
     return await this.postService.createPost(postRequestDto, req.user.id);
   }
 
-  @Get(AppRoute.POST_GET_ALL)
+  @Get()
   @HttpCode(HttpStatus.OK)
   @ApiGetResponse('모든 게시글 조회')
   async getAllPosts() {
@@ -35,24 +35,24 @@ export class PostController {
     return await this.postService.getPostByUserId(tokenData.sub);
   }
 
-  @Get(AppRoute.POST_GET_BY_ID)
+  @Get(AppRoute.POST_GET_BY_POST_ID)
   @HttpCode(HttpStatus.OK)
   @ApiGetResponse('게시글 상세 조회')
   async getPostById(@Param('postId') postId: string) {
-    return await this.postService.getPostById(postId);
+    return await this.postService.getPostById(parseInt(postId));
   }
 
   @Patch(AppRoute.POST_UPDATE)
   @HttpCode(HttpStatus.OK)
   @ApiUpdateResponse('게시글 수정')
   async updatePost(@Param('postId') postId: string, @Body() postRequestDto: PostRequestDto) {
-    return await this.postService.updatePost(postId, postRequestDto);
+    return await this.postService.updatePost(parseInt(postId), postRequestDto);
   }
 
   @Delete(AppRoute.POST_DELETE)
   @HttpCode(HttpStatus.OK)
   @ApiDeleteResponse('게시글 삭제')
   async deletePost(@Param('postId') postId: string) {
-    await this.postService.deletePost(postId);
+    await this.postService.deletePost(parseInt(postId));
   }
 }

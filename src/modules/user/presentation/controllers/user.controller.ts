@@ -15,21 +15,21 @@ import { JwtPayload } from 'src/shared/interfaces/jwt-payload.interface';
 export class UserController {
   constructor(private readonly userService: UserService) { }
 
-  @Get(AppRoute.USER_GET_BY_ID)
+  @Get()
   @HttpCode(HttpStatus.OK)
   @ApiGetResponse('사용자 조회', UserResponseDto)
   async getUserById(@CurrentUser() tokenData: JwtPayload): Promise<UserResponseDto> {
     return await this.userService.getUserById(tokenData.sub);
   }
 
-  @Patch(AppRoute.USER_UPDATE)
+  @Patch()
   @HttpCode(HttpStatus.OK)
   @ApiUpdateResponse('사용자 수정', UserResponseDto)
   async updateUser(@CurrentUser() tokenData: JwtPayload, @Body() userRequestDto: UserRequestDto): Promise<UserResponseDto> {
     return await this.userService.updateUser(tokenData.sub, userRequestDto);
   }
 
-  @Delete(AppRoute.USER_DELETE)
+  @Delete()
   @HttpCode(HttpStatus.OK)
   @ApiDeleteResponse('사용자 삭제')
   async deleteUser(@CurrentUser() tokenData: JwtPayload): Promise<void> {

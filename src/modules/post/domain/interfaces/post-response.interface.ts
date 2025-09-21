@@ -1,4 +1,4 @@
-export class PostResponseDto {
+export interface PostResponseInterface {
     postId: number;
     title: string;
     content: string;

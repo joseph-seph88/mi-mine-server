@@ -12,5 +12,5 @@ export class PostRequestDto {
 
     @ApiProperty({ description: '게시글 이미지', example: 'https://example.com/image.jpg' })
     @IsOptional()
-    image?: string;
+    imageUrl?: string;
 }

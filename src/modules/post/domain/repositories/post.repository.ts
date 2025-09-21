@@ -1,10 +1,11 @@
-import { Post } from '../entities/post.entity';
+import { PostRequestInterface } from '../interfaces/post-request.interface';
+import { PostResponseInterface } from '../interfaces/post-response.interface';
 
 export abstract class PostRepository {
-    abstract createPost(post: Post): Promise<Post>;
-    abstract getAllPosts(page: number, limit: number): Promise<Post[]>;
-    abstract getPostsByUserId(userId: string, page?: number, limit?: number): Promise<Post[]>;
-    abstract getPostById(postId: number): Promise<Post>;
-    abstract updatePost(id: number, post: Partial<Post>): Promise<Post | null>;
-    abstract deletePost(id: number): Promise<boolean>;
+    abstract createPost(data: PostRequestInterface): Promise<PostResponseInterface>;
+    abstract getAllPosts(page?: number, limit?: number): Promise<PostResponseInterface[]>;
+    abstract getPostsByUserId(userId: string, page?: number, limit?: number): Promise<PostResponseInterface[]>;
+    abstract getPostById(postId: number): Promise<PostResponseInterface>;
+    abstract updatePost(id: number, data: PostRequestInterface): Promise<PostResponseInterface>;
+    abstract deletePost(postId: number): Promise<void>;
 }

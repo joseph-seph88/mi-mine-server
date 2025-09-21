@@ -1,12 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { Post } from '../../domain/entities/post.entity';
-import { CreatePostCommand, CreatePostUseCase } from '../../domain/usecases/create-post.usecase';
+import { Injectable } from '@nestjs/common';
 import { UpdatePostUseCase } from '../../domain/usecases/update-post.usecase';
 import { DeletePostUseCase } from '../../domain/usecases/delete-post.usecase';
 import { GetAllPostsUseCase } from '../../domain/usecases/get-all-post.usecase';
 import { GetPostByUserIdUseCase } from '../../domain/usecases/get-post-by-user-id.usecase';
 import { GetPostByIdUseCase } from '../../domain/usecases/get-post-by-id.usecase';
 import { PostRequestDto } from '../../presentation/dtos/request/post-request.dto';
+import { PostResponseDto } from '../../presentation/dtos/response/post-response.dto';
+import { CreatePostUseCase } from '../../domain/usecases/create-post.usecase';
+import { PostRequestInterface } from '../../domain/interfaces/post-request.interface';
 
 @Injectable()
 export class PostService {
@@ -16,34 +17,35 @@ export class PostService {
     private readonly getPostByUserIdUseCase: GetPostByUserIdUseCase,
     private readonly getPostByIdUseCase: GetPostByIdUseCase,
     private readonly updatePostUseCase: UpdatePostUseCase,
-    private readonly deletePostUseCase: DeletePostUseCase,  
+    private readonly deletePostUseCase: DeletePostUseCase,
   ) { }
 
-  async createPost(postRequestDto: PostRequestDto, userId: string): Promise<Post> {
-    await this.createPostUseCase.execute(createPostDto, userId);
+  async createPost(postRequestDto: PostRequestDto, userId: string): Promise<PostResponseDto> {
+    const postData: PostRequestInterface = {
+      title: postRequestDto.title || '',
+      content: postRequestDto.content || '',
+      imageUrl: postRequestDto.imageUrl || '',
+    };
+    return await this.createPostUseCase.execute(postData);
   }
 
-  async getAllPosts(): Promise<Post[]> {
+  async getAllPosts(): Promise<PostResponseDto[]> {
     return await this.getAllPostsUseCase.execute();
   }
 
-  async getPostByUserId(id: string): Promise<Post> {
-    const post = await this.getPostByUserIdUseCase.execute(id);
-    if (!post) {
-      throw new NotFoundException(`게시글을 찾을 수 없습니다. ID: ${id}`);
-    }
-    return post;
+  async getPostByUserId(userId: string): Promise<PostResponseDto[]> {
+    return await this.getPostByUserIdUseCase.execute(userId);
   }
 
-  async getPostById(userId: string): Promise<Post[]> {
-    await this.getPostByIdUseCase.execute(userId);
+  async getPostById(postId: number): Promise<PostResponseDto> {
+    return await this.getPostByIdUseCase.execute(postId);
   }
 
-  async updatePost(id: string, updatePostDto: UpdatePostDto): Promise<Post> {
-    await this.updatePostUseCase.execute(id, updatePostDto);
+  async updatePost(postId: number, postRequestDto: PostRequestDto): Promise<PostResponseDto> {
+    return await this.updatePostUseCase.execute(postId, postRequestDto);
   }
 
-  async deletePost(id: string): Promise<void> {
-    await this.deletePostUseCase.execute(id);
+  async deletePost(postId: number): Promise<void> {
+    await this.deletePostUseCase.execute(postId);
   }
 }
