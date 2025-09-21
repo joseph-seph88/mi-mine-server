@@ -11,6 +11,7 @@ export const API_TAGS = {
 
 // 컨트롤러 경로 (영어)
 export const CONTROLLERS = {
+    APP: 'app',
     AUTH: 'auth',
     USER: 'user',
     POST: 'post',
