@@ -1,67 +1,61 @@
 # MiMine Server
 
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+Clean Architecture 패턴을 적용한 NestJS 기반 백엔드 서버
 
-[![Node.js Version](https://img.shields.io/badge/node.js-v23.3.0-green.svg)](https://nodejs.org/)
-[![NestJS Version](https://img.shields.io/badge/nestjs-v11.0.7-red.svg)](https://nestjs.com/)
-[![TypeScript](https://img.shields.io/badge/typescript-v5.7.3-blue.svg)](https://www.typescriptlang.org/)
-[![License](https://img.shields.io/badge/license-UNLICENSED-lightgrey.svg)]()
+**개발자**: Joseph88  
+**연락처**: pathetic.sim@gmail.com
 
-## 📋 프로젝트 정보
+## 기술 스택
 
-**Mi-Mine**은 **Clean Architecture** 패턴을 적용한 NestJS 기반의 백엔드 서버입니다.
+- **Node.js**: v23.3.0
+- **NestJS**: v11.0.7
+- **TypeScript**: v5.7.3
+- **PostgreSQL**: Database
+- **Redis**: Cache
+- **TypeORM**: ORM
+- **JWT**: Authentication
 
-- **개발자**: Joseph88
-- **아키텍처**: Clean Architecture (클린 아키텍처)
-- **프레임워크**: NestJS
-- **언어**: TypeScript
-- **목적**: 확장 가능하고 유지보수하기 쉬운 서버 구조 구현
+## 아키텍처
 
-### 🛠 기술 스택
-
-#### 핵심 기술
-- **Node.js**: v23.3.0 (런타임 환경)
-- **NestJS**: v11.0.7 (프레임워크)
-- **TypeScript**: v5.7.3 (언어)
-- **Package Manager**: npm v11.0.0
-- **Database**: PostgreSQL, Redis
-
-#### 개발 도구
-- **ESLint**: 코드 품질 관리
-- **Prettier**: 코드 포맷팅
-- **Jest**: 테스트 프레임워크
-- **SWC**: 빠른 TypeScript 컴파일러
-
-#### 주요 라이브러리
-- **class-validator**: DTO 유효성 검사
-- **class-transformer**: 객체 변환
-- **reflect-metadata**: 메타데이터 리플렉션
-
-### 🏗 아키텍처 구조
+### Clean Architecture 구조
 
 ```
 src/
-├── domain/                    # 🎯 도메인 레이어 (비즈니스 로직)
-│   ├── entities/             # 엔티티 (User 등)
-│   ├── repositories/         # 레포지토리 인터페이스
-│   ├── usecases/            # 유스케이스 (CreateUserUseCase 등)
-│   └── domain.module.ts     # 도메인 모듈
-├── application/              # 🔄 애플리케이션 레이어
-│   ├── services/            # 애플리케이션 서비스
-│   ├── dtos/               # 데이터 전송 객체
-│   ├── mappers/            # 매퍼 (엔티티 ↔ DTO)
-│   └── application.module.ts
-├── infrastructure/          # 🏭 인프라스트럭처 레이어
-│   ├── repositories/       # 레포지토리 구현체
-│   ├── external-services/  # 외부 서비스 (이메일 등)
-│   ├── config/            # 설정
-│   └── infrastructure.module.ts
-└── presentation/           # 🎨 프레젠테이션 레이어
-    ├── controllers/       # 컨트롤러
-    ├── middlewares/      # 미들웨어
-    ├── guards/          # 가드
-    ├── interceptors/    # 인터셉터
-    └── presentation.module.ts
+├── modules/                   # 비즈니스 모듈
+│   ├── auth/                  # 인증 시스템
+│   ├── user/                  # 사용자 관리
+│   ├── post/                  # 게시글 시스템
+│   └── comment/               # 댓글/대댓글 시스템
+└── shared/                    # 공통 모듈
 ```
+
+각 모듈은 4개 레이어로 구성:
+
+- **Domain Layer** - 비즈니스 규칙과 엔티티
+- **Infrastructure Layer** - 데이터베이스, 외부 서비스
+- **Application Layer** - 유스케이스, 서비스
+- **Presentation Layer** - 컨트롤러, DTO
+
+### 설계 이유
+
+1. **Clean Architecture 적용**
+   - 의존성 역전 원칙으로 테스트 용이성 확보
+   - 비즈니스 로직과 인프라 분리로 유지보수성 향상
+   - 모듈 간 결합도 최소화
+
+2. **Self-Referencing 댓글 구조**
+   - 무한 중첩 대댓글 지원
+   - 인스타그램/페이스북 스타일 구현
+   - 단일 테이블로 복잡한 계층 구조 관리
+
+3. **성능 최적화**
+   - Redis 캐싱으로 응답 속도 향상
+   - 페이지네이션으로 대용량 데이터 처리
+   - 지연 로딩으로 초기 로딩 시간 단축
+
+## 핵심 기능
+
+- JWT 기반 인증 시스템
+- 게시글 CRUD + 위치 기반 조회
+- 댓글/대댓글 시스템 (Self-Referencing)
+- Swagger API 문서화
