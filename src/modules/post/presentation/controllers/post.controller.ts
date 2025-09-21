@@ -1,72 +1,58 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, HttpStatus, HttpCode } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { PostService } from '../../application/services/post.service';
-import { CreatePostDto } from '../dtos/create-post.dto';
-import { UpdatePostDto } from '../dtos/update-post.dto';
-import { JwtAuthGuard } from '../../../../shared/security/guards/jwt-auth.guard';
+import { API_TAGS, CONTROLLERS } from 'src/shared/constants/api.constants';
+import { ApiCreateResponse, ApiDeleteResponse, ApiGetResponse, ApiUpdateResponse } from 'src/shared/decorators/swagger/api-response.decorator';
+import { AppRoute } from 'src/shared/enums/common';
+import { PostRequestDto } from '../dtos/request/post-request.dto';
+import { CurrentUser } from 'src/shared/decorators/current-user.decorator';
+import { JwtPayload } from 'src/shared/interfaces/jwt-payload.interface';
 
-@ApiTags('Posts')
-@Controller('posts')
+@ApiTags(API_TAGS.POST)
+@ApiBearerAuth()
+@Controller(CONTROLLERS.POST)
 export class PostController {
   constructor(private readonly postService: PostService) { }
 
-  @Post()
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: '게시글 생성' })
-  @ApiResponse({ status: 201, description: '게시글이 성공적으로 생성되었습니다.' })
-  async create(@Body() createPostDto: CreatePostDto, @Req() req: any) {
-    return await this.postService.create(createPostDto, req.user.id);
+  @Post(AppRoute.POST_CREATE)
+  @HttpCode(HttpStatus.CREATED)
+  @ApiCreateResponse('게시글 생성')
+  async createPost(@Body() postRequestDto: PostRequestDto, @Req() req: any) {
+    return await this.postService.createPost(postRequestDto, req.user.id);
   }
 
-  @Get()
-  @ApiOperation({ summary: '모든 게시글 조회' })
-  @ApiResponse({ status: 200, description: '게시글 목록을 성공적으로 조회했습니다.' })
-  async findAll() {
-    return await this.postService.findAll();
+  @Get(AppRoute.POST_GET_ALL)
+  @HttpCode(HttpStatus.OK)
+  @ApiGetResponse('모든 게시글 조회')
+  async getAllPosts() {
+    return await this.postService.getAllPosts();
   }
 
-  @Get('user/:userId')
-  @ApiOperation({ summary: '특정 사용자의 게시글 조회' })
-  @ApiResponse({ status: 200, description: '사용자의 게시글 목록을 성공적으로 조회했습니다.' })
-  async findByUserId(@Param('userId') userId: string) {
-    return await this.postService.findByUserId(userId);
+  @Get(AppRoute.POST_GET_BY_USER_ID)
+  @HttpCode(HttpStatus.OK)
+  @ApiGetResponse('특정 사용자의 게시글 조회')
+  async getPostsByUserId(@CurrentUser() tokenData: JwtPayload) {
+    return await this.postService.getPostByUserId(tokenData.sub);
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: '게시글 상세 조회' })
-  @ApiResponse({ status: 200, description: '게시글을 성공적으로 조회했습니다.' })
-  @ApiResponse({ status: 404, description: '게시글을 찾을 수 없습니다.' })
-  async findOne(@Param('id') id: string) {
-    return await this.postService.findOne(id);
+  @Get(AppRoute.POST_GET_BY_ID)
+  @HttpCode(HttpStatus.OK)
+  @ApiGetResponse('게시글 상세 조회')
+  async getPostById(@Param('postId') postId: string) {
+    return await this.postService.getPostById(postId);
   }
 
-  @Patch(':id')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: '게시글 수정' })
-  @ApiResponse({ status: 200, description: '게시글이 성공적으로 수정되었습니다.' })
-  @ApiResponse({ status: 404, description: '게시글을 찾을 수 없습니다.' })
-  async update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    return await this.postService.update(id, updatePostDto);
+  @Patch(AppRoute.POST_UPDATE)
+  @HttpCode(HttpStatus.OK)
+  @ApiUpdateResponse('게시글 수정')
+  async updatePost(@Param('postId') postId: string, @Body() postRequestDto: PostRequestDto) {
+    return await this.postService.updatePost(postId, postRequestDto);
   }
 
-  @Delete(':id')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: '게시글 삭제' })
-  @ApiResponse({ status: 200, description: '게시글이 성공적으로 삭제되었습니다.' })
-  @ApiResponse({ status: 404, description: '게시글을 찾을 수 없습니다.' })
-  async remove(@Param('id') id: string) {
-    await this.postService.remove(id);
-    return { message: '게시글이 성공적으로 삭제되었습니다.' };
-  }
-
-  @Get('stats/count')
-  @ApiOperation({ summary: '전체 게시글 수 조회' })
-  @ApiResponse({ status: 200, description: '게시글 수를 성공적으로 조회했습니다.' })
-  async getPostCount() {
-    const count = await this.postService.getPostCount();
-    return { count };
+  @Delete(AppRoute.POST_DELETE)
+  @HttpCode(HttpStatus.OK)
+  @ApiDeleteResponse('게시글 삭제')
+  async deletePost(@Param('postId') postId: string) {
+    await this.postService.deletePost(postId);
   }
 }

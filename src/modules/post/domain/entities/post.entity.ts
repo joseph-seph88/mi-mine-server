@@ -1,9 +1,10 @@
+import { TABLE_NAMES } from 'src/shared/constants/table.constants';
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
-@Entity('posts')
+@Entity(TABLE_NAMES.POST)
 export class Post {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @Column()
     title: string;
@@ -12,7 +13,7 @@ export class Post {
     content: string;
 
     @Column({ name: 'user_id' })
-    userId: string; // User와의 관계를 ID로만 관리 (순환의존 방지)
+    userId: string;
 
     @Column({ default: 0 })
     likeCount: number;
@@ -26,7 +27,6 @@ export class Post {
     @UpdateDateColumn()
     updatedAt: Date;
 
-    // 도메인 메서드
     static create(title: string, content: string, userId: string): Post {
         const post = new Post();
         post.title = title;
