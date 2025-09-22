@@ -12,7 +12,6 @@ export class AuthUserRepositoryImpl extends AuthUserRepository {
         super();
     }
 
-
     async registerUser(userData: RegisterRequestInterface): Promise<Boolean> {
         return await this.userService.createUser({
             email: userData.email,

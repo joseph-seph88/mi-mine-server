@@ -1,4 +1,4 @@
-import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
+import { Injectable, ForbiddenException } from '@nestjs/common';
 import { CreateCommentUseCase } from '../../domain/usecases/create-comment.usecase';
 import { GetCommentsByPostIdUseCase } from '../../domain/usecases/get-comments-by-post-id.usecase';
 import { GetCommentsByUserIdUseCase } from '../../domain/usecases/get-comments-by-user-id.usecase';

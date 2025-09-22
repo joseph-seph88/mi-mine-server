@@ -8,6 +8,7 @@ interface ApiResponseOptions {
     includeNotFound?: boolean;
     customErrors?: { status: number; description: string }[];
     wrapWithApiResponse?: boolean;
+    isArray?: boolean;
 }
 
 /**
@@ -28,6 +29,10 @@ export const ApiCommonResponses = <T = any>(
 
     if (finalOptions.wrapWithApiResponse) {
         if (responseType) {
+            const dataSchema = finalOptions.isArray
+                ? { type: 'array', items: { $ref: getSchemaPath(responseType) } }
+                : { $ref: getSchemaPath(responseType) };
+
             decorators.push(
                 ApiExtraModels(ApiResponseDto, responseType),
                 ApiResponse({
@@ -38,7 +43,7 @@ export const ApiCommonResponses = <T = any>(
                             { $ref: getSchemaPath(ApiResponseDto) },
                             {
                                 properties: {
-                                    data: { $ref: getSchemaPath(responseType) }
+                                    data: dataSchema
                                 }
                             }
                         ]

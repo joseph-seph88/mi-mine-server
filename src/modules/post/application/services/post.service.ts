@@ -29,30 +29,37 @@ export class PostService {
       content: postRequestDto.content || '',
       imageUrl: postRequestDto.imageUrl || '',
     };
-    return await this.createPostUseCase.execute(postData);
+
+    const result = await this.createPostUseCase.execute(postData);
+    return PostResponseDto.fromDomainResponse(result);
   }
 
-  async getAllPosts(): Promise<PostResponseDto[]> {
-    return await this.getAllPostsUseCase.execute();
+  async getAllPosts(page?: number, limit?: number): Promise<PostResponseDto[]> {
+    const result = await this.getAllPostsUseCase.execute(page, limit);
+    return result.map(PostResponseDto.fromDomainResponse);
   }
 
-  async getPostByUserId(userId: string): Promise<PostResponseDto[]> {
-    return await this.getPostByUserIdUseCase.execute(userId);
+  async getPostByUserId(userId: string, page?: number, limit?: number): Promise<PostResponseDto[]> {
+    const result = await this.getPostByUserIdUseCase.execute(userId, page, limit);
+    return result.map(PostResponseDto.fromDomainResponse);
   }
 
-  async getPostById(postId: number, includeComments?: boolean, commentLimit?: number): Promise<PostResponseDto> {
-    return await this.getPostByIdUseCase.execute(postId, includeComments, commentLimit);
+  async getPostById(postId: number): Promise<PostResponseDto> {
+    const result = await this.getPostByIdUseCase.execute(postId);
+    return PostResponseDto.fromDomainResponse(result);
   }
 
   async updatePost(postId: number, postRequestDto: PostRequestDto): Promise<PostResponseDto> {
-    return await this.updatePostUseCase.execute(postId, postRequestDto);
+    const result = await this.updatePostUseCase.execute(postId, postRequestDto);
+    return PostResponseDto.fromDomainResponse(result);
   }
 
   async deletePost(postId: number): Promise<void> {
     await this.deletePostUseCase.execute(postId);
   }
 
-  async getPostsByRadius(postRadiusRequestDto: PostRadiusRequestDto): Promise<PostResponseDto[]> {
-    return await this.getPostByRadiusUseCase.execute(postRadiusRequestDto);
+  async getPostsByRadius(postRadiusRequestDto: PostRadiusRequestDto, page?: number, limit?: number): Promise<PostResponseDto[]> {
+    const result = await this.getPostByRadiusUseCase.execute(postRadiusRequestDto, page, limit);
+    return result.map(PostResponseDto.fromDomainResponse);
   }
 }

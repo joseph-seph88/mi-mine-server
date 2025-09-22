@@ -78,12 +78,16 @@ export class PostRepositoryImpl implements PostRepository {
         }
     }
 
-    async getPostsByRadius(postRadiusRequestInterface: PostRadiusRequestInterface): Promise<PostResponseInterface[]> {
+    async getPostsByRadius(postRadiusRequestInterface: PostRadiusRequestInterface, page?: number, limit?: number): Promise<PostResponseInterface[]> {
         const { latitude, longitude, zoom, searchRadius } = postRadiusRequestInterface;
+        const actualPage = page ?? 1;
+        const actualLimit = limit ?? 10;
 
         const nearbyPosts = await this.postRepository
             .createQueryBuilder('post')
             .where('post.latitude IS NOT NULL AND post.longitude IS NOT NULL')
+            .skip((actualPage - 1) * actualLimit)
+            .take(actualLimit)
             .getMany();
 
         const postsWithDistance = nearbyPosts

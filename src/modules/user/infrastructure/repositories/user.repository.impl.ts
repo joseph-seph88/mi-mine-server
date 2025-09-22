@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserRepository } from '../../domain/repositories/user.repository';
 import { UpdateUserRequestInterface } from '../../domain/interfaces/request/update-request.interface';
 import { UserResponseInterface } from '../../domain/interfaces/response/user-response.interface';
@@ -13,27 +13,27 @@ export class UserRepositoryImpl extends UserRepository {
     super();
   }
 
-  async getUserById(id: string): Promise<UserResponseInterface | null> {
+  async getUserById(id: string): Promise<UserResponseInterface> {
     const userData = await this.sharedUserService.getUserById(id);
 
     if (!userData) {
-      return null;
+      throw new NotFoundException('사용자를 찾을 수 없습니다.');
     }
 
     return UserMapper.toResponseInterface(userData);
   }
 
-  async updateUser(id: string, userData: UpdateUserRequestInterface): Promise<UserResponseInterface | null> {
+  async updateUser(id: string, userData: UpdateUserRequestInterface): Promise<UserResponseInterface> {
     const userId = parseInt(id);
     if (isNaN(userId)) {
-      throw new Error(`Invalid user ID: ${id}`);
+      throw new Error(`사용자 ID가 유효하지 않습니다. ID: ${id}`);
     }
 
     const userRequestDto = UserMapper.toUserRequestDto(userData);
     const updatedUser = await this.sharedUserService.updateUser(userId, userRequestDto);
 
     if (!updatedUser) {
-      return null;
+      throw new NotFoundException('사용자를 찾을 수 없습니다.');
     }
 
     return UserMapper.toResponseInterface(updatedUser);

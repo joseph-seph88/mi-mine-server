@@ -18,8 +18,8 @@ export class AuthService {
         private readonly deleteTokenUseCase: DeleteTokenUseCase,
     ) { }
 
-    async register(request: RegisterRequestDto): Promise<boolean> {
-        return await this.registerUseCase.execute(request);
+    async register(request: RegisterRequestDto): Promise<void> {
+        await this.registerUseCase.execute(request);
     }
 
     async login(request: LoginRequestDto): Promise<LoginResponseDto> {

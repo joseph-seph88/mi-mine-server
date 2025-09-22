@@ -10,5 +10,4 @@ export interface PostResponseInterface {
     updatedAt: Date;
     latitude?: number;
     longitude?: number;
-    comments?: any[];
 }
