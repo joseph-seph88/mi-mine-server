@@ -1,16 +1,31 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { AppService } from './app.service';
+import { Public } from './shared/decorators/public.decorator';
+import { Roles } from './shared/decorators/roles.decorator';
+import { UserRole, AppRoute } from './shared/enums/common';
+import { API_TAGS, CONTROLLERS } from './shared/constants/api.constants';
+import { ApiGetResponse } from './shared/decorators/swagger/api-response.decorator';
+import { AppInfoResponseDto } from './shared/dtos/response/app-info-response.dto';
+import { AppHealthResponseDto } from './shared/dtos/response/app-health-response.dto';
 
-@Controller()
+@ApiTags(API_TAGS.APP)
+@Controller(CONTROLLERS.APP)
 export class AppController {
   constructor(private readonly appService: AppService) { }
 
-  @Get('app-info')
+  @Get(AppRoute.INFO)
+  @Roles(UserRole.ADMIN, UserRole.MODERATOR)
+  @HttpCode(HttpStatus.OK)
+  @ApiGetResponse('사용자 조회', AppInfoResponseDto)
   getInfo() {
     return this.appService.getInfo();
   }
 
-  @Get('app-health')
+  @Get(AppRoute.HEALTH)
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @ApiGetResponse('서버 상태 조회', AppHealthResponseDto)
   getHealth() {
     return this.appService.getHealth();
   }
