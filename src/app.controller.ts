@@ -6,6 +6,8 @@ import { Roles } from './shared/decorators/roles.decorator';
 import { UserRole, AppRoute } from './shared/enums/common';
 import { API_TAGS, CONTROLLERS } from './shared/constants/api.constants';
 import { ApiGetResponse } from './shared/decorators/swagger/api-response.decorator';
+import { AppInfoResponseDto } from './shared/dtos/response/app-info-response.dto';
+import { AppHealthResponseDto } from './shared/dtos/response/app-health-response.dto';
 
 @ApiTags(API_TAGS.APP)
 @Controller(CONTROLLERS.APP)
@@ -15,7 +17,7 @@ export class AppController {
   @Get(AppRoute.INFO)
   @Roles(UserRole.ADMIN, UserRole.MODERATOR)
   @HttpCode(HttpStatus.OK)
-  @ApiGetResponse('사용자 조회')
+  @ApiGetResponse('사용자 조회', AppInfoResponseDto)
   getInfo() {
     return this.appService.getInfo();
   }
@@ -23,7 +25,7 @@ export class AppController {
   @Get(AppRoute.HEALTH)
   @Public()
   @HttpCode(HttpStatus.OK)
-  @ApiGetResponse('서버 상태 조회')
+  @ApiGetResponse('서버 상태 조회', AppHealthResponseDto)
   getHealth() {
     return this.appService.getHealth();
   }

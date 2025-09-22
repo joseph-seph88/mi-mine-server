@@ -8,7 +8,7 @@ export class ApiResponseDto<T = any> {
     success: boolean;
 
     @ApiProperty({
-        example: 200/201,
+        example: 200,
         description: 'HTTP 상태 코드'
     })
     statusCode: number;

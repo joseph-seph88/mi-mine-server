@@ -7,6 +7,7 @@ export enum AppRoute {
     AUTH_LOGIN = 'login',
     AUTH_REGISTER = 'register',
     AUTH_REFRESH = 'refresh',
+    AUTH_DELETE_TOKEN = 'delete-token',
 
     // Post Routes
     POST_GET_BY_USER_ID = 'user/:userId',

@@ -9,5 +9,5 @@ export abstract class PostRepository {
     abstract getPostById(postId: number, includeComments?: boolean, commentLimit?: number): Promise<PostResponseInterface>;
     abstract updatePost(id: number, data: PostRequestInterface): Promise<PostResponseInterface>;
     abstract deletePost(postId: number): Promise<void>;
-    abstract getPostsByRadius(postRadiusRequestInterface: PostRadiusRequestInterface): Promise<PostResponseInterface[]>;
+    abstract getPostsByRadius(postRadiusRequestInterface: PostRadiusRequestInterface, page?: number, limit?: number): Promise<PostResponseInterface[]>;
 }
